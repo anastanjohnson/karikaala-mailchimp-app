@@ -65,8 +65,24 @@
 
     <section>
       <h2>Monthly summary — side by side</h2>
-      <p class="desc">Spend is Meta Ads only (Mailchimp is a flat subscription fee, not billed per campaign).</p>
+      <p class="desc">Spend is Meta Ads only (Mailchimp is a flat subscription fee, not billed per campaign). Click a month — in the chart above or a row below — to see that month's detail.</p>
       <div id="compareTable"></div>
+    </section>
+
+    <section id="compareDetailSection" style="display:none;">
+      <h2 id="compareDetailTitle">Month detail</h2>
+      <p class="desc">Both channels' top items for the selected month, side by side.</p>
+      <div class="kpi-row" id="compareDetailKpis" style="grid-template-columns: repeat(4,1fr); margin-bottom:16px;"></div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+        <div>
+          <div class="legend"><span class="legend-item"><span class="legend-dot ch-mailchimp"></span> Mailchimp campaigns</span></div>
+          <div id="compareDetailMailchimp"></div>
+        </div>
+        <div>
+          <div class="legend"><span class="legend-item"><span class="legend-dot ch-meta"></span> Meta ads</span></div>
+          <div id="compareDetailMeta"></div>
+        </div>
+      </div>
     </section>
   </div>
 
@@ -356,9 +372,12 @@ function allMonthsUnion() {
   return Array.from(new Set([...MONTHS.mailchimp, ...MONTHS.meta])).sort();
 }
 
+let compareMonth = null;
+
 function renderCompare() {
   const months = allMonthsUnion();
   if (!months.length) return;
+  if (!compareMonth || !months.includes(compareMonth)) compareMonth = months[months.length - 1];
 
   // KPI row: totals across all months, both channels
   const mcTotals = MONTHS.mailchimp.reduce((acc,m)=>{
@@ -390,12 +409,13 @@ function renderCompare() {
   el.innerHTML = months.map((m,i) => {
     const mcH = Math.max((mcVals[i]/mcMax*100), 2);
     const metaH = Math.max((metaVals[i]/metaMax*100), 2);
+    const isSel = m === compareMonth;
     return `
-    <div class="month-col">
+    <div class="month-col" style="cursor:pointer;" onclick="selectCompareMonth('${m}')">
       <div class="month-val">${fmt(mcVals[i])} / ${fmt(metaVals[i])}</div>
       <div class="month-bar-wrap">
-        <div class="month-bar" style="height:${mcH}%; flex:1;" data-tip="${MONTH_LABELS[m]} · Mailchimp opens: ${fmt(mcVals[i])}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
-        <div class="month-bar ch-meta" style="height:${metaH}%; flex:1;" data-tip="${MONTH_LABELS[m]} · Meta reach: ${fmt(metaVals[i])}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
+        <div class="month-bar ${isSel ? 'selected' : ''}" style="height:${mcH}%; flex:1;" data-tip="${MONTH_LABELS[m]} · Mailchimp opens: ${fmt(mcVals[i])} — click for detail" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
+        <div class="month-bar ch-meta ${isSel ? 'selected' : ''}" style="height:${metaH}%; flex:1;" data-tip="${MONTH_LABELS[m]} · Meta reach: ${fmt(metaVals[i])} — click for detail" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
       </div>
       <div class="month-lbl">${MONTH_LABELS[m]}</div>
     </div>`;
@@ -405,8 +425,9 @@ function renderCompare() {
   const rows = months.map(m => {
     const mck = computeKpisMailchimp(itemsFor("mailchimp", m));
     const metak = computeKpisMeta(itemsFor("meta", m));
+    const isSel = m === compareMonth;
     return `
-    <tr>
+    <tr class="compare-row ${isSel ? 'selected-row' : ''}" style="cursor:pointer;" onclick="selectCompareMonth('${m}')">
       <td>${MONTH_LABELS[m]}</td>
       <td class="num">${fmt(mck.opens)}</td>
       <td class="num">${fmt(mck.clicks)}</td>
@@ -421,6 +442,69 @@ function renderCompare() {
       <th class="num">Mailchimp opens</th><th class="num">Mailchimp clicks</th>
       <th class="num">Meta reach</th><th class="num">Meta results</th><th class="num">Meta spend</th>
     </tr></thead><tbody>${rows}</tbody></table>`;
+
+  renderCompareDetail();
+}
+
+function selectCompareMonth(m) {
+  compareMonth = m;
+  renderCompare();
+  const sec = document.getElementById("compareDetailSection");
+  if (sec) sec.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function renderCompareDetail() {
+  const sec = document.getElementById("compareDetailSection");
+  if (!compareMonth) { sec.style.display = "none"; return; }
+  sec.style.display = "";
+  const label = MONTH_LABELS[compareMonth];
+  document.getElementById("compareDetailTitle").textContent = `Month detail — ${label}`;
+
+  const mcItems = itemsFor("mailchimp", compareMonth);
+  const metaItems = itemsFor("meta", compareMonth);
+  const mck = computeKpisMailchimp(mcItems);
+  const metak = computeKpisMeta(metaItems);
+
+  document.getElementById("compareDetailKpis").innerHTML = [
+    ["Mailchimp opens", fmt(mck.opens)],
+    ["Mailchimp clicks", fmt(mck.clicks)],
+    ["Meta reach", fmt(metak.viewers)],
+    ["Meta spend", eur(metak.spend)],
+  ].map(([label,value]) => `
+    <div class="kpi"><div class="label">${label}</div><div class="value">${value}</div></div>
+  `).join("");
+
+  const mcEl = document.getElementById("compareDetailMailchimp");
+  if (!mcItems.length) {
+    mcEl.innerHTML = `<div class="empty-state">No Mailchimp campaigns this month.</div>`;
+  } else {
+    const sorted = [...mcItems].sort((a,b)=>b.opens-a.opens).slice(0, 8);
+    const max = Math.max(...sorted.map(c=>c.opens), 1);
+    mcEl.innerHTML = sorted.map(c => `
+      <div class="bar-row">
+        <div class="bar-label" title="${c.name}">${c.date} · ${c.name}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${(c.opens/max*100)}%" data-tip="Opens: ${fmt(c.opens)} · Clicks: ${fmt(c.clicks)}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
+        </div>
+        <div class="bar-value">${fmt(c.opens)}</div>
+      </div>`).join("");
+  }
+
+  const metaEl = document.getElementById("compareDetailMeta");
+  if (!metaItems.length) {
+    metaEl.innerHTML = `<div class="empty-state">No Meta ads this month.</div>`;
+  } else {
+    const sorted = [...metaItems].sort((a,b)=>b.viewers-a.viewers).slice(0, 8);
+    const max = Math.max(...sorted.map(a=>a.viewers), 1);
+    metaEl.innerHTML = sorted.map(a => `
+      <div class="bar-row">
+        <div class="bar-label" title="${a.name}">${a.date} · ${a.name}</div>
+        <div class="bar-track">
+          <div class="bar-fill ch-meta" style="width:${(a.viewers/max*100)}%" data-tip="Reach: ${fmt(a.viewers)} · Spend: ${eur(a.spend)}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
+        </div>
+        <div class="bar-value">${fmt(a.viewers)}</div>
+      </div>`).join("");
+  }
 }
 
 loadData();

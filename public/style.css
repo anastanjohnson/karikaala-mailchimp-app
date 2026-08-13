@@ -79,6 +79,9 @@ table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
 th { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.03em; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.compare-row:hover { background: var(--surface-2); }
+tr.compare-row.selected-row { background: var(--series-1-soft); }
+tr.compare-row.selected-row td:first-child { font-weight: 700; }
 .status-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 2px 8px; border-radius: 999px; }
 .status-pill.sent, .status-pill.active { background: var(--status-good)22; color: var(--status-good); }
 .status-pill.scheduled, .status-pill.completed { background: var(--status-warning)22; color: var(--status-warning); }
