@@ -61,6 +61,7 @@
       <button type="button" onclick="resetCompareRange()">All time</button>
       <span id="compareRangeLabel" style="font-size:12px; color:var(--text-muted);"></span>
     </div>
+    <div class="controls" id="compareMonthButtons" style="margin-bottom:14px; flex-wrap:wrap;"></div>
     <div class="kpi-row" id="compareKpiRow" style="grid-template-columns: repeat(4,1fr);"></div>
 
     <section>
@@ -447,6 +448,29 @@ function resetCompareRange() {
   renderCompare();
 }
 
+function selectCompareSingleMonth(m) {
+  compareRange.from = m;
+  compareRange.to = m;
+  renderCompare();
+}
+
+function monthShortLabel(m) {
+  const [, mo] = m.split("-");
+  const names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return names[parseInt(mo, 10) - 1];
+}
+
+function renderCompareMonthButtons() {
+  const months = allMonthsUnion();
+  const el = document.getElementById("compareMonthButtons");
+  if (!el) return;
+  const isSingleMonthSelected = compareRange.from === compareRange.to;
+  el.innerHTML = months.map(m => {
+    const active = isSingleMonthSelected && compareRange.from === m;
+    return `<button type="button" class="toggle-btn ${active ? 'active' : ''}" onclick="selectCompareSingleMonth('${m}')">${monthShortLabel(m)}</button>`;
+  }).join("");
+}
+
 function monthsInRange() {
   const all = allMonthsUnion();
   if (!compareRange.from || !compareRange.to) return all;
@@ -457,6 +481,7 @@ function renderCompare() {
   const allMonths = allMonthsUnion();
   if (!allMonths.length) return;
   populateCompareRangeSelects();
+  renderCompareMonthButtons();
   const months = monthsInRange();
   document.getElementById("compareRangeLabel").textContent = months.length
     ? `${MONTH_LABELS[months[0]]} – ${MONTH_LABELS[months[months.length-1]]} (${months.length} month${months.length===1?"":"s"})`
