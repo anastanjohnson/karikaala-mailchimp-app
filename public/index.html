@@ -51,6 +51,16 @@
 
   <!-- Combined comparison view -->
   <div id="compareView" style="display:none;">
+    <div class="controls" style="margin-bottom:14px;">
+      <label style="font-size:12px; color:var(--text-muted);">From
+        <select id="compareFrom" onchange="onCompareRangeChange()"></select>
+      </label>
+      <label style="font-size:12px; color:var(--text-muted);">To
+        <select id="compareTo" onchange="onCompareRangeChange()"></select>
+      </label>
+      <button type="button" onclick="resetCompareRange()">All time</button>
+      <span id="compareRangeLabel" style="font-size:12px; color:var(--text-muted);"></span>
+    </div>
     <div class="kpi-row" id="compareKpiRow" style="grid-template-columns: repeat(4,1fr);"></div>
 
     <section>
@@ -384,20 +394,68 @@ function allMonthsUnion() {
 }
 
 let compareMonth = null;
+let compareRange = { from: null, to: null };
 
-function renderCompare() {
+function populateCompareRangeSelects() {
   const months = allMonthsUnion();
   if (!months.length) return;
-  if (!compareMonth || !months.includes(compareMonth)) compareMonth = months[months.length - 1];
+  if (!compareRange.from || !months.includes(compareRange.from)) compareRange.from = months[0];
+  if (!compareRange.to || !months.includes(compareRange.to)) compareRange.to = months[months.length - 1];
+  const opts = months.map(m => `<option value="${m}">${MONTH_LABELS[m]}</option>`).join("");
+  const fromSel = document.getElementById("compareFrom");
+  const toSel = document.getElementById("compareTo");
+  fromSel.innerHTML = opts;
+  toSel.innerHTML = opts;
+  fromSel.value = compareRange.from;
+  toSel.value = compareRange.to;
+}
 
-  // KPI row: totals across all months, both channels
-  const mcTotals = MONTHS.mailchimp.reduce((acc,m)=>{
+function onCompareRangeChange() {
+  const from = document.getElementById("compareFrom").value;
+  const to = document.getElementById("compareTo").value;
+  // keep range valid (from <= to); if user flips them, swap
+  if (from > to) {
+    compareRange.from = to;
+    compareRange.to = from;
+  } else {
+    compareRange.from = from;
+    compareRange.to = to;
+  }
+  renderCompare();
+}
+
+function resetCompareRange() {
+  const months = allMonthsUnion();
+  if (!months.length) return;
+  compareRange.from = months[0];
+  compareRange.to = months[months.length - 1];
+  renderCompare();
+}
+
+function monthsInRange() {
+  const all = allMonthsUnion();
+  if (!compareRange.from || !compareRange.to) return all;
+  return all.filter(m => m >= compareRange.from && m <= compareRange.to);
+}
+
+function renderCompare() {
+  const allMonths = allMonthsUnion();
+  if (!allMonths.length) return;
+  populateCompareRangeSelects();
+  const months = monthsInRange();
+  document.getElementById("compareRangeLabel").textContent = months.length
+    ? `${MONTH_LABELS[months[0]]} – ${MONTH_LABELS[months[months.length-1]]} (${months.length} month${months.length===1?"":"s"})`
+    : "No months in range";
+  if (!compareMonth || !months.includes(compareMonth)) compareMonth = months[months.length - 1] || null;
+
+  // KPI row: totals across months in the selected range, both channels
+  const mcTotals = months.filter(m=>MONTHS.mailchimp.includes(m)).reduce((acc,m)=>{
     const k = computeKpisMailchimp(itemsFor("mailchimp", m));
     acc.opens += k.opens; acc.clicks += k.clicks; acc.revenue += k.revenue;
     acc.invoice += invoiceFor(m);
     return acc;
   }, {opens:0, clicks:0, revenue:0, invoice:0});
-  const metaTotals = MONTHS.meta.reduce((acc,m)=>{
+  const metaTotals = months.filter(m=>MONTHS.meta.includes(m)).reduce((acc,m)=>{
     const k = computeKpisMeta(itemsFor("meta", m));
     acc.spend += k.spend; acc.viewers += k.viewers; acc.results += k.results;
     return acc;
