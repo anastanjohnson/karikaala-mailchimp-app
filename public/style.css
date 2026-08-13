@@ -58,6 +58,14 @@ select, .toggle-btn, input, button {
 .toggle-btn.active { border-color: var(--series-1); color: var(--series-1); font-weight: 600; }
 .toggle-btn.active.ch-meta { border-color: var(--series-2); color: var(--series-2); }
 .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 24px; }
+.kpi-group { border: 1.5px solid var(--kpi-accent, var(--border)); border-radius: 12px; padding: 14px 14px 16px; margin-bottom: 16px; background: var(--kpi-accent-soft, transparent); }
+.kpi-group .kpi-row { margin-bottom: 0; }
+.kpi-group-heading { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--kpi-accent, var(--text-secondary)); margin-bottom: 10px; }
+.kpi-group-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--kpi-accent, var(--text-muted)); flex-shrink: 0; }
+.kpi-group-spend { --kpi-accent: #eb6834; --kpi-accent-soft: #eb68340d; }
+.kpi-group-response { --kpi-accent: #2a78d6; --kpi-accent-soft: #2a78d60d; }
+.kpi-group-results { --kpi-accent: #1baf7a; --kpi-accent-soft: #1baf7a0d; }
+.kpi-group .kpi { background: var(--surface-2); }
 .kpi { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
 .kpi .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
 .kpi .value { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
