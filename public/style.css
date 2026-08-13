@@ -66,6 +66,9 @@ select, .toggle-btn, input, button {
 .kpi-group-response { --kpi-accent: #2a78d6; --kpi-accent-soft: #2a78d60d; }
 .kpi-group-results { --kpi-accent: #1baf7a; --kpi-accent-soft: #1baf7a0d; }
 .kpi-group .kpi { background: var(--surface-2); }
+.kpi-highlight { background: var(--kpi-accent-soft, var(--series-1-soft)) !important; border: 1.5px solid var(--kpi-accent, var(--series-1)) !important; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.kpi-highlight .label { color: var(--kpi-accent, var(--series-1)); font-weight: 700; }
+.kpi-highlight .value { color: var(--kpi-accent, var(--series-1)); }
 .kpi { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
 .kpi .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
 .kpi .value { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }

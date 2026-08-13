@@ -555,12 +555,12 @@ function renderCompare() {
   const totalSpend = metaTotals.spend + mcTotals.invoice + extraSpendSum;
   const totalGuests = months.reduce((sum,m) => sum + guestsFor(m), 0);
 
-  const kpiHtml = pairs => pairs.map(([label,value]) => `
-    <div class="kpi"><div class="label">${label}</div><div class="value">${value}</div></div>
+  const kpiHtml = pairs => pairs.map(([label,value,highlight]) => `
+    <div class="kpi${highlight ? ' kpi-highlight' : ''}"><div class="label">${label}</div><div class="value">${value}</div></div>
   `).join("");
 
   document.getElementById("compareKpiRowSpend").innerHTML = kpiHtml([
-    ["Total marketing spend", eur(totalSpend)],
+    ["Total marketing spend", eur(totalSpend), true],
     ["Meta Ads — spend", eur(metaTotals.spend)],
     ["Mailchimp — spend", eur(mcTotals.invoice)],
     ...extraTotals.map(v => [`${v.label} — spend`, eur(v.spend)]),
@@ -571,7 +571,7 @@ function renderCompare() {
   ]);
   document.getElementById("compareKpiRowGuests").innerHTML = kpiHtml([
     ["Total guest visits", fmt(totalGuests)],
-    ["Total spend per guest", perGuestLabel(totalSpend, totalGuests, eur)],
+    ["Total spend per guest", perGuestLabel(totalSpend, totalGuests, eur), true],
   ]);
 
   renderSpendPerGuestChart(months);
