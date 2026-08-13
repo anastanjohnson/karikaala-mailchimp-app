@@ -27,11 +27,11 @@
 
   <!-- Single-channel view -->
   <div id="singleView" style="display:none;">
-    <div class="controls" style="margin: 10px 0 18px;">
-      <select id="monthSelect" aria-label="Select month"></select>
+    <div class="controls" style="margin: 10px 0 8px;">
       <button class="toggle-btn active" id="chartToggle" onclick="setView('chart')">Chart view</button>
       <button class="toggle-btn" id="tableToggle" onclick="setView('table')">Table view</button>
     </div>
+    <div class="controls full-row" id="singleMonthButtons" style="margin-bottom:14px;"></div>
 
     <div class="kpi-row" id="kpiRow"></div>
 
@@ -152,23 +152,33 @@ async function loadData() {
   [...MONTHS.mailchimp, ...MONTHS.meta].forEach(m => MONTH_LABELS[m] = labelFor(m));
   currentMonth.mailchimp = MONTHS.mailchimp[MONTHS.mailchimp.length-1] || null;
   currentMonth.meta = MONTHS.meta[MONTHS.meta.length-1] || null;
-  populateMonthSelect();
+  populateSingleMonthButtons();
   render();
   renderCompare();
   setChannel("compare");
 }
 
-function populateMonthSelect() {
-  const sel = document.getElementById("monthSelect");
-  sel.innerHTML = "";
-  MONTHS[channel].forEach(m => {
-    const opt = document.createElement("option");
-    opt.value = m;
-    opt.textContent = MONTH_LABELS[m];
-    if (m === currentMonth[channel]) opt.selected = true;
-    sel.appendChild(opt);
-  });
-  sel.onchange = e => { currentMonth[channel] = e.target.value; render(); };
+function selectSingleMonth(m) {
+  currentMonth[channel] = m;
+  render();
+}
+
+function populateSingleMonthButtons() {
+  const el = document.getElementById("singleMonthButtons");
+  if (!el) return;
+  const months = MONTHS[channel] || [];
+  const names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const year = months.length ? months[0].split("-")[0] : "2026";
+  el.innerHTML = names.map((name, i) => {
+    const m = `${year}-${String(i + 1).padStart(2, "0")}`;
+    const hasData = months.includes(m);
+    const active = currentMonth[channel] === m;
+    const cls = ["toggle-btn"];
+    if (active) cls.push("active");
+    if (channel === "meta" && active) cls.push("ch-meta");
+    if (!hasData) cls.push("disabled");
+    return `<button type="button" class="${cls.join(' ')}" ${hasData ? `onclick="selectSingleMonth('${m}')"` : "disabled"}>${name}</button>`;
+  }).join("");
 }
 
 function itemsFor(ch, month) {
@@ -350,7 +360,6 @@ function renderMonthBars() {
 
 function selectMonth(m) {
   currentMonth[channel] = m;
-  document.getElementById("monthSelect").value = m;
   render();
 }
 
@@ -385,7 +394,7 @@ function setChannel(ch) {
   document.getElementById("singleView").style.display = ch === "compare" ? "none" : "";
   document.getElementById("compareView").style.display = ch === "compare" ? "" : "none";
   if (ch !== "compare") {
-    populateMonthSelect();
+    populateSingleMonthButtons();
     render();
   }
 }
@@ -400,6 +409,7 @@ function toggleTheme() {
 function render() {
   const month = currentMonth[channel];
   const cm = CHANNEL_META[channel];
+  populateSingleMonthButtons();
   document.getElementById("trendTitle").textContent = `Monthly trend — ${cm.label}`;
   document.getElementById("trendDesc").textContent = `Total ${cm.metricLabel.toLowerCase()} by month. Click a bar to jump to that month.`;
   if (!month) {
