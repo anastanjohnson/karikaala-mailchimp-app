@@ -1,0 +1,38 @@
+{
+    "2026-01": { "campaigns": [
+          { "date": "Jan 13", "name": "Pongal 2026", "status": "sent", "opens": 501, "clicks": 37, "unsubscribes": 44, "revenue": 0 },
+          { "date": "Jan 14", "name": "Pongal 2026 (copy 02)", "status": "sent", "opens": 176, "clicks": 10, "unsubscribes": 24, "revenue": 0 }
+    ]},
+    "2026-02": { "campaigns": [
+          { "date": "Feb 13", "name": "14.02", "status": "sent", "opens": 1, "clicks": 0, "unsubscribes": 0, "revenue": 0 },
+          { "date": "Feb 15", "name": "14.02 (copy 01)", "status": "sent", "opens": 6, "clicks": 1, "unsubscribes": 0, "revenue": 0 },
+          { "date": "Feb 15", "name": "14.02 (copy 02)", "status": "sent", "opens": 59, "clicks": 10, "unsubscribes": 1, "revenue": 0 }
+    ]},
+    "2026-03": { "campaigns": [
+          { "date": "Mar 5", "name": "14.02 (copy 03)", "status": "sent", "opens": 14, "clicks": 0, "unsubscribes": 0, "revenue": 0 },
+          { "date": "Mar 11", "name": "19.03", "status": "sent", "opens": 8, "clicks": 0, "unsubscribes": 0, "revenue": 0 },
+          { "date": "Mar 17", "name": "30% Discout", "status": "sent", "opens": 802, "clicks": 178, "unsubscribes": 19, "revenue": 0 },
+          { "date": "Mar 31", "name": "Vaaheesan", "status": "sent", "opens": 126, "clicks": 10, "unsubscribes": 10, "revenue": 0 }
+    ]},
+    "2026-04": { "campaigns": [
+          { "date": "Apr 19", "name": "Chozha 35 19,20 april", "status": "sent", "opens": 622, "clicks": 66, "unsubscribes": 29, "revenue": 0 },
+          { "date": "Apr 26", "name": "Chozha 35 26,27 april", "status": "sent", "opens": 505, "clicks": 35, "unsubscribes": 42, "revenue": 0 },
+          { "date": "Apr 30", "name": "10% Offer 01.05 - 04.05", "status": "sent", "opens": 482, "clicks": 25, "unsubscribes": 21, "revenue": 0 }
+    ]},
+    "2026-05": { "campaigns": [
+          { "date": "May 1", "name": "10% Offer 01.05 - 04.05 2nd", "status": "sent", "opens": 173, "clicks": 5, "unsubscribes": 22, "revenue": 0 },
+          { "date": "May 5", "name": "Vedan Live Concert", "status": "sent", "opens": 76, "clicks": 8, "unsubscribes": 6, "revenue": 0 },
+          { "date": "May 5", "name": "Vedan Meet & Greet", "status": "sent", "opens": 83, "clicks": 1, "unsubscribes": 6, "revenue": 0 },
+          { "date": "May 5", "name": "Vedan Meet & Greet — Ticket sold Emails", "status": "sent", "opens": 22, "clicks": 6, "unsubscribes": 0, "revenue": 0 },
+          { "date": "May 7", "name": "Resend: Vedan Live Concert", "status": "sent", "opens": 18, "clicks": 0, "unsubscribes": 1, "revenue": 0 },
+          { "date": "May 7", "name": "Resend: Vedan Meet & Greet", "status": "sent", "opens": 13, "clicks": 0, "unsubscribes": 3, "revenue": 0 },
+          { "date": "May 8", "name": "Vedan Live Concert (copy 01)", "status": "sent", "opens": 53, "clicks": 9, "unsubscribes": 2, "revenue": 0 }
+    ]},
+    "2026-06": { "campaigns": [
+          { "date": "Jun 30", "name": "Abishan Event", "status": "sent", "opens": 683, "clicks": 42, "unsubscribes": 63, "revenue": 0 }
+    ]},
+    "2026-07": { "campaigns": [] },
+    "2026-08": { "campaigns": [
+          { "date": "Aug 12", "name": "CHOZHA APERITIF Offer", "status": "sent", "opens": 453, "clicks": 36, "unsubscribes": 15, "revenue": 0 }
+    ]}
+}
