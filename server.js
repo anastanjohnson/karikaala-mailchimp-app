@@ -52,6 +52,18 @@ app.get("/api/session", (req, res) => {
   res.json({ loggedIn: !!(req.session && req.session.loggedIn) });
 });
 
+// Monthly guest visit counts (restaurant-wide, not tied to a marketing channel)
+// Registered before /api/:channel/months so "guests" is never captured as a :channel param.
+app.get("/api/guests/months", (req, res) => {
+  res.json(db.getGuests());
+});
+
+app.put("/api/guests/months/:month", requireAuth, (req, res) => {
+  const amount = Number((req.body || {}).guests);
+  const saved = db.setGuests(req.params.month, isNaN(amount) ? 0 : amount);
+  res.json({ month: req.params.month, guests: saved });
+});
+
 // --- Data (multi-channel) ---
 app.get("/api/:channel/months", validChannel, (req, res) => {
   res.json(db.getMonths(req.params.channel));
@@ -79,17 +91,6 @@ app.put("/api/:channel/months/:month/invoice", validChannel, requireAuth, (req, 
   const amount = Number((req.body || {}).invoice);
   const saved = db.setInvoice(req.params.channel, req.params.month, isNaN(amount) ? 0 : amount);
   res.json(saved);
-});
-
-// Monthly guest visit counts (restaurant-wide, not tied to a marketing channel)
-app.get("/api/guests/months", (req, res) => {
-  res.json(db.getGuests());
-});
-
-app.put("/api/guests/months/:month", requireAuth, (req, res) => {
-  const amount = Number((req.body || {}).guests);
-  const saved = db.setGuests(req.params.month, isNaN(amount) ? 0 : amount);
-  res.json({ month: req.params.month, guests: saved });
 });
 
 app.delete("/api/:channel/months/:month", validChannel, requireAuth, (req, res) => {
