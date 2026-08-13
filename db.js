@@ -88,6 +88,16 @@ function deleteItem(channel, month, index) {
   writeAll(data);
 }
 
+function setInvoice(channel, month, amount) {
+  const data = readAll();
+  const key = itemKey(channel);
+  if (!data[channel]) data[channel] = {};
+  if (!data[channel][month]) data[channel][month] = { [key]: [] };
+  data[channel][month].invoice = Number(amount) || 0;
+  writeAll(data);
+  return data[channel][month];
+}
+
 module.exports = {
   CHANNELS,
   ensureDataFile,
@@ -99,4 +109,5 @@ module.exports = {
   addItem,
   updateItem,
   deleteItem,
+  setInvoice,
 };

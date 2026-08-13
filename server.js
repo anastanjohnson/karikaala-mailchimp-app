@@ -65,8 +65,19 @@ app.get("/api/:channel/months/:month", validChannel, (req, res) => {
 
 app.put("/api/:channel/months/:month", validChannel, requireAuth, (req, res) => {
   const key = db.CHANNELS[req.params.channel];
+  const existing = db.getMonth(req.params.channel, req.params.month);
   const body = req.body && req.body[key] ? req.body : { [key]: [] };
+  if (existing && existing.invoice !== undefined && body.invoice === undefined) {
+    body.invoice = existing.invoice;
+  }
   const saved = db.setMonth(req.params.channel, req.params.month, body);
+  res.json(saved);
+});
+
+// Monthly invoice / plan cost (mailchimp is a flat subscription, billed monthly, not per campaign)
+app.put("/api/:channel/months/:month/invoice", validChannel, requireAuth, (req, res) => {
+  const amount = Number((req.body || {}).invoice);
+  const saved = db.setInvoice(req.params.channel, req.params.month, isNaN(amount) ? 0 : amount);
   res.json(saved);
 });
 
