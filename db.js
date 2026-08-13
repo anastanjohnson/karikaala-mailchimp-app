@@ -1,79 +1,102 @@
-// Simple JSON-file "database". No native compiled dependencies, so it runs
-// on any Node host without a build step. For heavier concurrent write loads,
-// swap this module out for a real database (e.g. Render Postgres) — every
-// other file talks to storage only through the functions exported here, so
-// that swap doesn't touch server.js or the frontend.
 const fs = require("fs");
 const path = require("path");
 
-const DATA_FILE = path.join(__dirname, "data", "campaigns.json");
+const DATA_FILE = path.join(__dirname, "data", "marketing.json");
 const SEED_FILE = path.join(__dirname, "data", "seed.json");
 
+const CHANNELS = {
+  mailchimp: "campaigns",
+  meta: "ads",
+};
+
 function ensureDataFile() {
-    if (!fs.existsSync(DATA_FILE)) {
-          const seed = fs.readFileSync(SEED_FILE, "utf-8");
-          fs.writeFileSync(DATA_FILE, seed);
-    }
+  if (!fs.existsSync(DATA_FILE)) {
+    const seed = fs.existsSync(SEED_FILE)
+      ? fs.readFileSync(SEED_FILE, "utf8")
+      : JSON.stringify({ mailchimp: {}, meta: {} }, null, 2);
+    fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
+    fs.writeFileSync(DATA_FILE, seed);
+  }
 }
 
 function readAll() {
-    ensureDataFile();
-    const raw = fs.readFileSync(DATA_FILE, "utf-8");
-    return JSON.parse(raw);
+  ensureDataFile();
+  const raw = fs.readFileSync(DATA_FILE, "utf8");
+  const data = JSON.parse(raw || "{}");
+  if (!data.mailchimp) data.mailchimp = {};
+  if (!data.meta) data.meta = {};
+  return data;
 }
 
 function writeAll(data) {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
 
-function getMonths() {
-    const data = readAll();
-    return Object.keys(data).sort();
+function itemKey(channel) {
+  return CHANNELS[channel];
 }
 
-function getMonth(month) {
-    const data = readAll();
-    return data[month] || null;
+function getMonths(channel) {
+  const data = readAll();
+  return data[channel] || {};
 }
 
-function setMonth(month, monthData) {
-    const data = readAll();
-    data[month] = monthData;
-    writeAll(data);
-    return data[month];
+function getMonth(channel, month) {
+  const data = readAll();
+  return (data[channel] && data[channel][month]) || null;
 }
 
-function deleteMonth(month) {
-    const data = readAll();
-    delete data[month];
-    writeAll(data);
+function setMonth(channel, month, monthData) {
+  const data = readAll();
+  if (!data[channel]) data[channel] = {};
+  data[channel][month] = monthData;
+  writeAll(data);
+  return data[channel][month];
 }
 
-function addCampaign(month, campaign) {
-    const data = readAll();
-    if (!data[month]) data[month] = { campaigns: [] };
-    data[month].campaigns.push(campaign);
-    writeAll(data);
-    return data[month];
+function deleteMonth(channel, month) {
+  const data = readAll();
+  if (data[channel]) delete data[channel][month];
+  writeAll(data);
 }
 
-function updateCampaign(month, index, campaign) {
-    const data = readAll();
-    if (!data[month] || !data[month].campaigns[index]) return null;
-    data[month].campaigns[index] = campaign;
-    writeAll(data);
-    return data[month];
+function addItem(channel, month, item) {
+  const data = readAll();
+  const key = itemKey(channel);
+  if (!data[channel]) data[channel] = {};
+  if (!data[channel][month]) data[channel][month] = { [key]: [] };
+  if (!data[channel][month][key]) data[channel][month][key] = [];
+  data[channel][month][key].push(item);
+  writeAll(data);
+  return item;
 }
 
-function deleteCampaign(month, index) {
-    const data = readAll();
-    if (!data[month] || !data[month].campaigns[index]) return null;
-    data[month].campaigns.splice(index, 1);
-    writeAll(data);
-    return data[month];
+function updateItem(channel, month, index, item) {
+  const data = readAll();
+  const key = itemKey(channel);
+  if (!data[channel] || !data[channel][month] || !data[channel][month][key]) return null;
+  data[channel][month][key][index] = item;
+  writeAll(data);
+  return item;
+}
+
+function deleteItem(channel, month, index) {
+  const data = readAll();
+  const key = itemKey(channel);
+  if (!data[channel] || !data[channel][month] || !data[channel][month][key]) return;
+  data[channel][month][key].splice(index, 1);
+  writeAll(data);
 }
 
 module.exports = {
-    readAll, writeAll, getMonths, getMonth, setMonth, deleteMonth,
-    addCampaign, updateCampaign, deleteCampaign,
+  CHANNELS,
+  ensureDataFile,
+  readAll,
+  getMonths,
+  getMonth,
+  setMonth,
+  deleteMonth,
+  addItem,
+  updateItem,
+  deleteItem,
 };
