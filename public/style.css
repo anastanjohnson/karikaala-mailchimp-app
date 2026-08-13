@@ -122,4 +122,13 @@ form.admin-form input, form.admin-form select { width: 100%; }
 .legend-dot.ch-mailchimp { background: var(--series-1); }
 .legend-dot.ch-meta { background: var(--series-2); }
 .channel-tabs { display: flex; gap: 6px; margin-bottom: 4px; }
+.full-row { width: 100%; }
+.full-row.channel-tabs > .toggle-btn { flex: 1; text-align: center; }
+.controls.full-row { display: flex; width: 100%; gap: 8px; }
+.controls.full-row > button, .controls.full-row > label { flex: 1; }
+#compareMonthButtons.full-row { flex-wrap: nowrap; }
+#compareMonthButtons.full-row > .toggle-btn { flex: 1; text-align: center; padding-left: 4px; padding-right: 4px; }
+.toggle-btn.disabled { opacity: 0.35; cursor: not-allowed; }
+.toggle-btn.disabled:hover { filter: none; }
+@media (max-width: 700px) { #compareMonthButtons.full-row { flex-wrap: wrap; } #compareMonthButtons.full-row > .toggle-btn { flex: 1 1 22%; } }
 @media (max-width: 900px) { .kpi-row { grid-template-columns: repeat(3, 1fr); } .bar-label { width: 130px; } form.admin-form { grid-template-columns: repeat(2, 1fr); } }
