@@ -597,7 +597,6 @@ function renderCompare() {
       const guests = guestsFor(m);
       const rows = [
         { label: "Spend", mc: mcSpend, meta: metak.spend, mcFmt: usd(mcSpend), metaFmt: eur(metak.spend) },
-        { label: "Reach / Opens", mc: mck.opens, meta: metak.viewers, mcFmt: fmt(mck.opens), metaFmt: fmt(metak.viewers) },
         { label: "Cost per guest", mc: guests ? mcSpend/guests : 0, meta: guests ? metak.spend/guests : 0, mcFmt: perGuestLabel(mcSpend, guests, usd), metaFmt: perGuestLabel(metak.spend, guests, eur) },
       ];
       singleEl.innerHTML = rows.map(r => {
