@@ -20,13 +20,13 @@
   </header>
 
   <div class="channel-tabs">
-    <button class="toggle-btn active" id="tabMailchimp" onclick="setChannel('mailchimp')">Mailchimp</button>
+    <button class="toggle-btn" id="tabMailchimp" onclick="setChannel('mailchimp')">Mailchimp</button>
     <button class="toggle-btn" id="tabMeta" onclick="setChannel('meta')">Meta Ads</button>
-    <button class="toggle-btn" id="tabCompare" onclick="setChannel('compare')">Compare channels</button>
+    <button class="toggle-btn active" id="tabCompare" onclick="setChannel('compare')">Compare channels</button>
   </div>
 
   <!-- Single-channel view -->
-  <div id="singleView">
+  <div id="singleView" style="display:none;">
     <div class="controls" style="margin: 10px 0 18px;">
       <select id="monthSelect" aria-label="Select month"></select>
       <button class="toggle-btn active" id="chartToggle" onclick="setView('chart')">Chart view</button>
@@ -50,7 +50,7 @@
   </div>
 
   <!-- Combined comparison view -->
-  <div id="compareView" style="display:none;">
+  <div id="compareView">
     <div class="controls" style="margin-bottom:14px;">
       <label style="font-size:12px; color:var(--text-muted);">From
         <select id="compareFrom" onchange="onCompareRangeChange()"></select>
@@ -123,7 +123,7 @@ let DATA = { mailchimp: {}, meta: {} };
 let GUESTS = {};
 let MONTHS = { mailchimp: [], meta: [] };
 const MONTH_LABELS = {};
-let channel = "mailchimp";
+let channel = "compare";
 let currentMonth = { mailchimp: null, meta: null };
 let currentView = "chart";
 
