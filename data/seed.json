@@ -1,38 +1,1054 @@
 {
-    "2026-01": { "campaigns": [
-          { "date": "Jan 13", "name": "Pongal 2026", "status": "sent", "opens": 501, "clicks": 37, "unsubscribes": 44, "revenue": 0 },
-          { "date": "Jan 14", "name": "Pongal 2026 (copy 02)", "status": "sent", "opens": 176, "clicks": 10, "unsubscribes": 24, "revenue": 0 }
-    ]},
-    "2026-02": { "campaigns": [
-          { "date": "Feb 13", "name": "14.02", "status": "sent", "opens": 1, "clicks": 0, "unsubscribes": 0, "revenue": 0 },
-          { "date": "Feb 15", "name": "14.02 (copy 01)", "status": "sent", "opens": 6, "clicks": 1, "unsubscribes": 0, "revenue": 0 },
-          { "date": "Feb 15", "name": "14.02 (copy 02)", "status": "sent", "opens": 59, "clicks": 10, "unsubscribes": 1, "revenue": 0 }
-    ]},
-    "2026-03": { "campaigns": [
-          { "date": "Mar 5", "name": "14.02 (copy 03)", "status": "sent", "opens": 14, "clicks": 0, "unsubscribes": 0, "revenue": 0 },
-          { "date": "Mar 11", "name": "19.03", "status": "sent", "opens": 8, "clicks": 0, "unsubscribes": 0, "revenue": 0 },
-          { "date": "Mar 17", "name": "30% Discout", "status": "sent", "opens": 802, "clicks": 178, "unsubscribes": 19, "revenue": 0 },
-          { "date": "Mar 31", "name": "Vaaheesan", "status": "sent", "opens": 126, "clicks": 10, "unsubscribes": 10, "revenue": 0 }
-    ]},
-    "2026-04": { "campaigns": [
-          { "date": "Apr 19", "name": "Chozha 35 19,20 april", "status": "sent", "opens": 622, "clicks": 66, "unsubscribes": 29, "revenue": 0 },
-          { "date": "Apr 26", "name": "Chozha 35 26,27 april", "status": "sent", "opens": 505, "clicks": 35, "unsubscribes": 42, "revenue": 0 },
-          { "date": "Apr 30", "name": "10% Offer 01.05 - 04.05", "status": "sent", "opens": 482, "clicks": 25, "unsubscribes": 21, "revenue": 0 }
-    ]},
-    "2026-05": { "campaigns": [
-          { "date": "May 1", "name": "10% Offer 01.05 - 04.05 2nd", "status": "sent", "opens": 173, "clicks": 5, "unsubscribes": 22, "revenue": 0 },
-          { "date": "May 5", "name": "Vedan Live Concert", "status": "sent", "opens": 76, "clicks": 8, "unsubscribes": 6, "revenue": 0 },
-          { "date": "May 5", "name": "Vedan Meet & Greet", "status": "sent", "opens": 83, "clicks": 1, "unsubscribes": 6, "revenue": 0 },
-          { "date": "May 5", "name": "Vedan Meet & Greet — Ticket sold Emails", "status": "sent", "opens": 22, "clicks": 6, "unsubscribes": 0, "revenue": 0 },
-          { "date": "May 7", "name": "Resend: Vedan Live Concert", "status": "sent", "opens": 18, "clicks": 0, "unsubscribes": 1, "revenue": 0 },
-          { "date": "May 7", "name": "Resend: Vedan Meet & Greet", "status": "sent", "opens": 13, "clicks": 0, "unsubscribes": 3, "revenue": 0 },
-          { "date": "May 8", "name": "Vedan Live Concert (copy 01)", "status": "sent", "opens": 53, "clicks": 9, "unsubscribes": 2, "revenue": 0 }
-    ]},
-    "2026-06": { "campaigns": [
-          { "date": "Jun 30", "name": "Abishan Event", "status": "sent", "opens": 683, "clicks": 42, "unsubscribes": 63, "revenue": 0 }
-    ]},
-    "2026-07": { "campaigns": [] },
-    "2026-08": { "campaigns": [
-          { "date": "Aug 12", "name": "CHOZHA APERITIF Offer", "status": "sent", "opens": 453, "clicks": 36, "unsubscribes": 15, "revenue": 0 }
-    ]}
+  "mailchimp": {
+    "2026-01": {
+      "campaigns": [
+        {
+          "date": "Jan 13",
+          "name": "Pongal 2026",
+          "status": "sent",
+          "opens": 501,
+          "clicks": 37,
+          "unsubscribes": 44,
+          "revenue": 0
+        },
+        {
+          "date": "Jan 14",
+          "name": "Pongal 2026 (copy 02)",
+          "status": "sent",
+          "opens": 176,
+          "clicks": 10,
+          "unsubscribes": 24,
+          "revenue": 0
+        }
+      ]
+    },
+    "2026-02": {
+      "campaigns": [
+        {
+          "date": "Feb 13",
+          "name": "14.02",
+          "status": "sent",
+          "opens": 1,
+          "clicks": 0,
+          "unsubscribes": 0,
+          "revenue": 0
+        },
+        {
+          "date": "Feb 15",
+          "name": "14.02 (copy 01)",
+          "status": "sent",
+          "opens": 6,
+          "clicks": 1,
+          "unsubscribes": 0,
+          "revenue": 0
+        },
+        {
+          "date": "Feb 15",
+          "name": "14.02 (copy 02)",
+          "status": "sent",
+          "opens": 59,
+          "clicks": 10,
+          "unsubscribes": 1,
+          "revenue": 0
+        }
+      ]
+    },
+    "2026-03": {
+      "campaigns": [
+        {
+          "date": "Mar 5",
+          "name": "14.02 (copy 03)",
+          "status": "sent",
+          "opens": 14,
+          "clicks": 0,
+          "unsubscribes": 0,
+          "revenue": 0
+        },
+        {
+          "date": "Mar 11",
+          "name": "19.03",
+          "status": "sent",
+          "opens": 8,
+          "clicks": 0,
+          "unsubscribes": 0,
+          "revenue": 0
+        },
+        {
+          "date": "Mar 17",
+          "name": "30% Discout",
+          "status": "sent",
+          "opens": 802,
+          "clicks": 178,
+          "unsubscribes": 19,
+          "revenue": 0
+        },
+        {
+          "date": "Mar 31",
+          "name": "Vaaheesan",
+          "status": "sent",
+          "opens": 126,
+          "clicks": 10,
+          "unsubscribes": 10,
+          "revenue": 0
+        }
+      ]
+    },
+    "2026-04": {
+      "campaigns": [
+        {
+          "date": "Apr 19",
+          "name": "Chozha 35 19,20 april",
+          "status": "sent",
+          "opens": 622,
+          "clicks": 66,
+          "unsubscribes": 29,
+          "revenue": 0
+        },
+        {
+          "date": "Apr 26",
+          "name": "Chozha 35 26,27 april",
+          "status": "sent",
+          "opens": 505,
+          "clicks": 35,
+          "unsubscribes": 42,
+          "revenue": 0
+        },
+        {
+          "date": "Apr 30",
+          "name": "10% Offer 01.05 - 04.05",
+          "status": "sent",
+          "opens": 482,
+          "clicks": 25,
+          "unsubscribes": 21,
+          "revenue": 0
+        }
+      ]
+    },
+    "2026-05": {
+      "campaigns": [
+        {
+          "date": "May 1",
+          "name": "10% Offer 01.05 - 04.05 2nd",
+          "status": "sent",
+          "opens": 173,
+          "clicks": 5,
+          "unsubscribes": 22,
+          "revenue": 0
+        },
+        {
+          "date": "May 5",
+          "name": "Vedan Live Concert",
+          "status": "sent",
+          "opens": 76,
+          "clicks": 8,
+          "unsubscribes": 6,
+          "revenue": 0
+        },
+        {
+          "date": "May 5",
+          "name": "Vedan Meet & Greet",
+          "status": "sent",
+          "opens": 83,
+          "clicks": 1,
+          "unsubscribes": 6,
+          "revenue": 0
+        },
+        {
+          "date": "May 5",
+          "name": "Vedan Meet & Greet \u2014 Ticket sold Emails",
+          "status": "sent",
+          "opens": 22,
+          "clicks": 6,
+          "unsubscribes": 0,
+          "revenue": 0
+        },
+        {
+          "date": "May 7",
+          "name": "Resend: Vedan Live Concert",
+          "status": "sent",
+          "opens": 18,
+          "clicks": 0,
+          "unsubscribes": 1,
+          "revenue": 0
+        },
+        {
+          "date": "May 7",
+          "name": "Resend: Vedan Meet & Greet",
+          "status": "sent",
+          "opens": 13,
+          "clicks": 0,
+          "unsubscribes": 3,
+          "revenue": 0
+        },
+        {
+          "date": "May 8",
+          "name": "Vedan Live Concert (copy 01)",
+          "status": "sent",
+          "opens": 53,
+          "clicks": 9,
+          "unsubscribes": 2,
+          "revenue": 0
+        }
+      ]
+    },
+    "2026-06": {
+      "campaigns": [
+        {
+          "date": "Jun 30",
+          "name": "Abishan Event",
+          "status": "sent",
+          "opens": 683,
+          "clicks": 42,
+          "unsubscribes": 63,
+          "revenue": 0
+        }
+      ]
+    },
+    "2026-07": {
+      "campaigns": []
+    },
+    "2026-08": {
+      "campaigns": [
+        {
+          "date": "Aug 12",
+          "name": "CHOZHA APERITIF Offer",
+          "status": "sent",
+          "opens": 453,
+          "clicks": 36,
+          "unsubscribes": 15,
+          "revenue": 0
+        }
+      ]
+    }
+  },
+  "meta": {
+    "2026-01": {
+      "ads": [
+        {
+          "date": "Jan 23",
+          "name": "Valentine's teaser \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Link Clicks",
+          "results": 151,
+          "views": 6662,
+          "viewers": 4596,
+          "spend": 20.6
+        },
+        {
+          "date": "Jan 22",
+          "name": "KARIKAALA Kultur & Genuss \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Link Clicks",
+          "results": 401,
+          "views": 21687,
+          "viewers": 13590,
+          "spend": 54.79
+        },
+        {
+          "date": "Jan 22",
+          "name": "Sivappi Mocktail \u2014 Boosted post",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 118,
+          "views": 3588,
+          "viewers": 2383,
+          "spend": 24.88
+        },
+        {
+          "date": "Jan 7",
+          "name": "Pongal Festmahl \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 1603,
+          "views": 22879,
+          "viewers": 13165,
+          "spend": 54.72
+        },
+        {
+          "date": "Jan 7",
+          "name": "S\u00fcdindien Aromen \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Link Clicks",
+          "results": 1370,
+          "views": 44044,
+          "viewers": 26167,
+          "spend": 79.94
+        },
+        {
+          "date": "Dec 31",
+          "name": "New Year Bookings \u2014 Website schedule",
+          "status": "completed",
+          "resultType": "Website schedule",
+          "results": 0,
+          "views": 7113,
+          "viewers": 3903,
+          "spend": 30.44
+        },
+        {
+          "date": "Dec 31",
+          "name": "Silvester Danke \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 545,
+          "views": 13394,
+          "viewers": 8684,
+          "spend": 31.0
+        }
+      ]
+    },
+    "2026-02": {
+      "ads": [
+        {
+          "date": "Feb 19",
+          "name": "Rap-Star Ticket promo \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Link Clicks",
+          "results": 980,
+          "views": 16196,
+          "viewers": 7845,
+          "spend": 36.15
+        },
+        {
+          "date": "Feb 5",
+          "name": "Valentinstag Date-Night \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 819,
+          "views": 11642,
+          "viewers": 8132,
+          "spend": 44.77
+        },
+        {
+          "date": "Feb 5",
+          "name": "Valentinstag Date-Night \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Link Clicks",
+          "results": 669,
+          "views": 19480,
+          "viewers": 14387,
+          "spend": 60.51
+        },
+        {
+          "date": "Jan 23",
+          "name": "Valentine's teaser \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Link Clicks",
+          "results": 92,
+          "views": 4279,
+          "viewers": 3170,
+          "spend": 12.85
+        },
+        {
+          "date": "Jan 22",
+          "name": "KARIKAALA Kultur & Genuss \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Link Clicks",
+          "results": 205,
+          "views": 11279,
+          "viewers": 8504,
+          "spend": 31.42
+        }
+      ]
+    },
+    "2026-03": {
+      "ads": [
+        {
+          "date": "Mar 30",
+          "name": "Vaaheesan Tickets \u2014 Get more bookings",
+          "status": "completed",
+          "resultType": "Landing page views",
+          "results": 478,
+          "views": 7678,
+          "viewers": 4933,
+          "spend": 24.33
+        },
+        {
+          "date": "Mar 25",
+          "name": "Rap Ceylon & Vaheesan \u2014 Website clicks",
+          "status": "completed",
+          "resultType": "Landing page views",
+          "results": 960,
+          "views": 24696,
+          "viewers": 12484,
+          "spend": 79.89
+        },
+        {
+          "date": "Mar 18",
+          "name": "Wiederer\u00f6ffnung 30% Rabatt \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 1011,
+          "views": 12796,
+          "viewers": 10705,
+          "spend": 39.9
+        },
+        {
+          "date": "Mar 18",
+          "name": "Chozha All You Can \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 203,
+          "views": 3716,
+          "viewers": 2938,
+          "spend": 19.88
+        },
+        {
+          "date": "Mar 18",
+          "name": "Treue-Rabatt 30% \u2014 Boosted FB post",
+          "status": "completed",
+          "resultType": "Landing page views",
+          "results": 178,
+          "views": 8492,
+          "viewers": 6185,
+          "spend": 32.62
+        },
+        {
+          "date": "Mar 17",
+          "name": "Sri Lanka Tapas \u2014 Website clicks",
+          "status": "paused",
+          "resultType": "Landing page views",
+          "results": 1219,
+          "views": 20193,
+          "viewers": 12600,
+          "spend": 57.05
+        },
+        {
+          "date": "Mar 13",
+          "name": "Re-Opening Countdown \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 489,
+          "views": 6417,
+          "viewers": 4847,
+          "spend": 23.87
+        },
+        {
+          "date": "Mar 12",
+          "name": "Vorbereitungen \u2014 Boosted FB reel",
+          "status": "completed",
+          "resultType": "ThruPlays",
+          "results": 8754,
+          "views": 19969,
+          "viewers": 13391,
+          "spend": 24.94
+        },
+        {
+          "date": "Feb 19",
+          "name": "Rap-Star Ticket promo \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Link Clicks",
+          "results": 1835,
+          "views": 25405,
+          "viewers": 13697,
+          "spend": 73.75
+        }
+      ]
+    },
+    "2026-04": {
+      "ads": [
+        {
+          "date": "Apr 30",
+          "name": "Vedan Meet & Greet \u2014 Boosted post",
+          "status": "completed",
+          "resultType": "Link Clicks",
+          "results": 42,
+          "views": 1851,
+          "viewers": 1730,
+          "spend": 6.14
+        },
+        {
+          "date": "Apr 22",
+          "name": "Sri Lanka R\u00fcckzugsort \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Landing page views",
+          "results": 406,
+          "views": 11914,
+          "viewers": 9056,
+          "spend": 33.52
+        },
+        {
+          "date": "Apr 17",
+          "name": "Weekend Tisch sichern \u2014 Get more bookings",
+          "status": "completed",
+          "resultType": "Landing page views",
+          "results": 1461,
+          "views": 33707,
+          "viewers": 23119,
+          "spend": 92.92
+        },
+        {
+          "date": "Apr 10",
+          "name": "Kulinarische Vielfalt \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Landing page views",
+          "results": 1834,
+          "views": 40063,
+          "viewers": 24330,
+          "spend": 110.59
+        },
+        {
+          "date": "Apr 9",
+          "name": "Truffle Naan \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 843,
+          "views": 8914,
+          "viewers": 7370,
+          "spend": 31.77
+        },
+        {
+          "date": "Mar 30",
+          "name": "Vaaheesan Tickets \u2014 Get more bookings",
+          "status": "completed",
+          "resultType": "Landing page views",
+          "results": 737,
+          "views": 14847,
+          "viewers": 8924,
+          "spend": 43.91
+        },
+        {
+          "date": "Mar 25",
+          "name": "Rap Ceylon & Vaheesan \u2014 Website clicks",
+          "status": "completed",
+          "resultType": "Landing page views",
+          "results": 430,
+          "views": 15611,
+          "viewers": 10065,
+          "spend": 48.9
+        },
+        {
+          "date": "Mar 17",
+          "name": "Sri Lanka Tapas \u2014 Website clicks",
+          "status": "paused",
+          "resultType": "Landing page views",
+          "results": 1035,
+          "views": 44333,
+          "viewers": 26761,
+          "spend": 124.62
+        }
+      ]
+    },
+    "2026-05": {
+      "ads": [
+        {
+          "date": "May 28",
+          "name": "Mango Chicken Curry \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 245,
+          "views": 4168,
+          "viewers": 3476,
+          "spend": 17.19
+        },
+        {
+          "date": "May 27",
+          "name": "08/15-Restaurant? \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 156,
+          "views": 11155,
+          "viewers": 10498,
+          "spend": 30.29
+        },
+        {
+          "date": "May 15",
+          "name": "May Remembrance Eelam \u2014 Boosted FB reel",
+          "status": "completed",
+          "resultType": "ThruPlays",
+          "results": 2872,
+          "views": 13075,
+          "viewers": 9017,
+          "spend": 49.85
+        },
+        {
+          "date": "May 13",
+          "name": "KARIKAALA x Vedan \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 1012,
+          "views": 17904,
+          "viewers": 12026,
+          "spend": 69.63
+        },
+        {
+          "date": "May 12",
+          "name": "Dieses Gericht spaltet \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 758,
+          "views": 13999,
+          "viewers": 10243,
+          "spend": 59.75
+        },
+        {
+          "date": "May 8",
+          "name": "All You Can Ex\"Beer\"ience \u2014 Boosted reel",
+          "status": "paused",
+          "resultType": "Profile visits",
+          "results": 3996,
+          "views": 52706,
+          "viewers": 39774,
+          "spend": 207.07
+        },
+        {
+          "date": "May 7",
+          "name": "Vedan Meet & Greet \u2014 Boosted post",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 425,
+          "views": 17226,
+          "viewers": 11734,
+          "spend": 59.87
+        },
+        {
+          "date": "May 6",
+          "name": "Limited Tables Vedan \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 86,
+          "views": 3673,
+          "viewers": 2870,
+          "spend": 24.9
+        },
+        {
+          "date": "May 4",
+          "name": "Hard Beats promo \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Landing page views",
+          "results": 137,
+          "views": 7318,
+          "viewers": 5580,
+          "spend": 24.36
+        },
+        {
+          "date": "May 2",
+          "name": "Unvergesslicher Abend \u2014 Website clicks",
+          "status": "completed",
+          "resultType": "Landing page views",
+          "results": 323,
+          "views": 14587,
+          "viewers": 9207,
+          "spend": 40.79
+        },
+        {
+          "date": "May 1",
+          "name": "All You Can Ex\"Beer\"ience \u2014 Boosted reel",
+          "status": "paused",
+          "resultType": "Profile visits",
+          "results": 2408,
+          "views": 26248,
+          "viewers": 21129,
+          "spend": 87.27
+        },
+        {
+          "date": "May 1",
+          "name": "Triff Vedan pers\u00f6nlich \u2014 Get more bookings",
+          "status": "completed",
+          "resultType": "Landing page views",
+          "results": 337,
+          "views": 14618,
+          "viewers": 8606,
+          "spend": 46.23
+        },
+        {
+          "date": "Apr 30",
+          "name": "Vedan Meet & Greet \u2014 Boosted post",
+          "status": "completed",
+          "resultType": "Link Clicks",
+          "results": 526,
+          "views": 23839,
+          "viewers": 15202,
+          "spend": 53.69
+        },
+        {
+          "date": "Apr 22",
+          "name": "Sri Lanka R\u00fcckzugsort \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Landing page views",
+          "results": 3339,
+          "views": 73859,
+          "viewers": 40052,
+          "spend": 225.02
+        },
+        {
+          "date": "Apr 10",
+          "name": "Kulinarische Vielfalt \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Landing page views",
+          "results": 4184,
+          "views": 107000,
+          "viewers": 62460,
+          "spend": 311.49
+        },
+        {
+          "date": "Mar 30",
+          "name": "Vaaheesan Tickets \u2014 Get more bookings",
+          "status": "completed",
+          "resultType": "Landing page views",
+          "results": 74,
+          "views": 3499,
+          "viewers": 2932,
+          "spend": 12.87
+        },
+        {
+          "date": "Mar 25",
+          "name": "Rap Ceylon & Vaheesan \u2014 Website clicks",
+          "status": "completed",
+          "resultType": "Landing page views",
+          "results": 66,
+          "views": 2475,
+          "viewers": 2322,
+          "spend": 9.69
+        }
+      ]
+    },
+    "2026-06": {
+      "ads": [
+        {
+          "date": "Jun 29",
+          "name": "Summer Cultural Night ticket \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 38,
+          "views": 1704,
+          "viewers": 1305,
+          "spend": 12.66
+        },
+        {
+          "date": "Jun 29",
+          "name": "Sommer schmeckt besser \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 43,
+          "views": 1277,
+          "viewers": 1107,
+          "spend": 8.39
+        },
+        {
+          "date": "Jun 25",
+          "name": "WM2026 Takeaway 20% \u2014 Promote contact info",
+          "status": "paused",
+          "resultType": "Link Clicks",
+          "results": 9,
+          "views": 3306,
+          "viewers": 1305,
+          "spend": 18.65
+        },
+        {
+          "date": "Jun 24",
+          "name": "Kulturabend \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Landing page views",
+          "results": 262,
+          "views": 12772,
+          "viewers": 8379,
+          "spend": 51.32
+        },
+        {
+          "date": "Jun 20",
+          "name": "Terrasse sichern \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 424,
+          "views": 10279,
+          "viewers": 8291,
+          "spend": 49.71
+        },
+        {
+          "date": "Jun 19",
+          "name": "Mehr Sommer pro Tisch \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 1049,
+          "views": 22630,
+          "viewers": 17154,
+          "spend": 99.9
+        },
+        {
+          "date": "Jun 19",
+          "name": "Cocktail/Mocktail gratis \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Landing page views",
+          "results": 149,
+          "views": 10393,
+          "viewers": 7777,
+          "spend": 51.17
+        },
+        {
+          "date": "Jun 19",
+          "name": "Sommerstart \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 85,
+          "views": 4351,
+          "viewers": 3563,
+          "spend": 26.94
+        },
+        {
+          "date": "Jun 18",
+          "name": "35\u20ac Summer Experience \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Landing page views",
+          "results": 236,
+          "views": 15446,
+          "viewers": 8028,
+          "spend": 86.08
+        },
+        {
+          "date": "Jun 17",
+          "name": "Mridangam & Thavil Kulturabend \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 150,
+          "views": 5300,
+          "viewers": 3292,
+          "spend": 41.83
+        },
+        {
+          "date": "Jun 16",
+          "name": "Mango Chicken Curry \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 119,
+          "views": 3084,
+          "viewers": 2727,
+          "spend": 23.51
+        },
+        {
+          "date": "Jun 16",
+          "name": "Newsletter Rabattcode \u2014 New customers",
+          "status": "paused",
+          "resultType": "Meta leads",
+          "results": 0,
+          "views": 588,
+          "viewers": 398,
+          "spend": 8.44
+        },
+        {
+          "date": "Jun 12",
+          "name": "Mango Chicken Curry \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 108,
+          "views": 3741,
+          "viewers": 3038,
+          "spend": 29.96
+        },
+        {
+          "date": "Jun 11",
+          "name": "Newsletter Rabattcode \u2014 New customers",
+          "status": "paused",
+          "resultType": "Meta leads",
+          "results": 0,
+          "views": 1659,
+          "viewers": 810,
+          "spend": 15.16
+        },
+        {
+          "date": "Jun 10",
+          "name": "Mehr Sommer pro Tisch \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 490,
+          "views": 8582,
+          "viewers": 7009,
+          "spend": 34.86
+        },
+        {
+          "date": "Jun 10",
+          "name": "Summer Terrace Experience \u2014 Get more bookings",
+          "status": "active",
+          "resultType": "Landing page views",
+          "results": 1866,
+          "views": 34013,
+          "viewers": 25712,
+          "spend": 100.89
+        },
+        {
+          "date": "Jun 5",
+          "name": "KARIKAALA x Vedan \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 318,
+          "views": 7431,
+          "viewers": 5848,
+          "spend": 34.8
+        },
+        {
+          "date": "Jun 5",
+          "name": "Firmen-Event \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 154,
+          "views": 3734,
+          "viewers": 2825,
+          "spend": 27.16
+        },
+        {
+          "date": "Jun 3",
+          "name": "\u00dcber 100 Gerichte \u2014 Boosted FB reel",
+          "status": "completed",
+          "resultType": "Link Clicks",
+          "results": 6,
+          "views": 612,
+          "viewers": 507,
+          "spend": 4.76
+        },
+        {
+          "date": "May 28",
+          "name": "Mango Chicken Curry \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 249,
+          "views": 5037,
+          "viewers": 4257,
+          "spend": 17.64
+        }
+      ]
+    },
+    "2026-07": {
+      "ads": [
+        {
+          "date": "Jul 21",
+          "name": "Ferienangebot Baby Bee \u2014 Boosted post",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 38,
+          "views": 5317,
+          "viewers": 5299,
+          "spend": 17.5
+        },
+        {
+          "date": "Jul 21",
+          "name": "All You Can Experience 35\u20ac \u2014 Boosted post",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 36,
+          "views": 2130,
+          "viewers": 1815,
+          "spend": 14.61
+        },
+        {
+          "date": "Jul 16",
+          "name": "Ferienstart Eis \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 172,
+          "views": 4188,
+          "viewers": 3058,
+          "spend": 27.57
+        },
+        {
+          "date": "Jul 16",
+          "name": "Cocktail/Mocktail bis Ende Juli \u2014 Get more bookings",
+          "status": "active",
+          "resultType": "Landing page views",
+          "results": 681,
+          "views": 36633,
+          "viewers": 22568,
+          "spend": 123.44
+        },
+        {
+          "date": "Jul 12",
+          "name": "Summer Vibes \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 26,
+          "views": 2244,
+          "viewers": 1552,
+          "spend": 17.52
+        },
+        {
+          "date": "Jul 9",
+          "name": "Summer Vibes \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 24,
+          "views": 1431,
+          "viewers": 1115,
+          "spend": 13.64
+        },
+        {
+          "date": "Jul 6",
+          "name": "Montag Terrasse \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 384,
+          "views": 8584,
+          "viewers": 6641,
+          "spend": 39.75
+        },
+        {
+          "date": "Jul 3",
+          "name": "Cocktail gratis + Fassbiere \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Landing page views",
+          "results": 19,
+          "views": 1705,
+          "viewers": 1388,
+          "spend": 6.09
+        },
+        {
+          "date": "Jul 1",
+          "name": "Summer Night Mridangam & Thavil \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 214,
+          "views": 4281,
+          "viewers": 3295,
+          "spend": 29.91
+        },
+        {
+          "date": "Jun 29",
+          "name": "Summer Cultural Night ticket \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 55,
+          "views": 2197,
+          "viewers": 1666,
+          "spend": 16.08
+        },
+        {
+          "date": "Jun 29",
+          "name": "Sommer schmeckt besser \u2014 Boosted reel",
+          "status": "completed",
+          "resultType": "Profile visits",
+          "results": 115,
+          "views": 3308,
+          "viewers": 2926,
+          "spend": 22.66
+        },
+        {
+          "date": "Jun 24",
+          "name": "Kulturabend \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Landing page views",
+          "results": 185,
+          "views": 8501,
+          "viewers": 6407,
+          "spend": 36.58
+        },
+        {
+          "date": "Jun 18",
+          "name": "35\u20ac Summer Experience \u2014 Get more bookings",
+          "status": "paused",
+          "resultType": "Landing page views",
+          "results": 95,
+          "views": 7191,
+          "viewers": 4544,
+          "spend": 33.94
+        },
+        {
+          "date": "Jun 10",
+          "name": "Summer Terrace Experience \u2014 Get more bookings",
+          "status": "active",
+          "resultType": "Landing page views",
+          "results": 3665,
+          "views": 68835,
+          "viewers": 52215,
+          "spend": 153.89
+        }
+      ]
+    }
+  }
 }
