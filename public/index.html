@@ -75,7 +75,9 @@
 
     <div class="kpi-group kpi-group-results">
       <div class="kpi-group-heading"><span class="kpi-group-dot"></span>Results</div>
-      <div class="kpi-row" id="compareKpiRowGuests" style="grid-template-columns: repeat(2,1fr);"></div>
+      <div class="kpi-row" id="compareKpiRowGuests" style="grid-template-columns: repeat(2,1fr); margin-bottom:14px;"></div>
+      <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px; font-weight:600;">Total spend per guest, by month</div>
+      <div id="spendPerGuestChart"></div>
     </div>
 
     <section>
@@ -570,6 +572,8 @@ function renderCompare() {
     ["Total spend per guest", perGuestLabel(totalSpend, totalGuests, eur)],
   ]);
 
+  renderSpendPerGuestChart(months);
+
   // dual bar chart, independently scaled — only useful with 2+ months; otherwise show a
   // single-month channel comparison chart instead (a lone bar-pair isn't informative).
   const barsEl = document.getElementById("compareBars");
@@ -682,6 +686,65 @@ function renderCompare() {
     </div>`;
 
   renderCompareDetail();
+}
+
+function spendPerGuestForMonth(m) {
+  const mcSpend = invoiceFor(m);
+  const metaSpend = computeKpisMeta(itemsFor("meta", m)).spend;
+  const extraSpend = EXTRA_VENDORS.reduce((s,v) => s + extraVendorSpendForMonths(v, [m]), 0);
+  const spend = mcSpend + metaSpend + extraSpend;
+  const guests = guestsFor(m);
+  return guests > 0 ? spend / guests : null;
+}
+
+function renderSpendPerGuestChart(months) {
+  const el = document.getElementById("spendPerGuestChart");
+  if (!el) return;
+  const points = months.map(m => ({ month: m, value: spendPerGuestForMonth(m) }));
+  const known = points.filter(p => p.value !== null);
+  if (known.length < 2) {
+    el.innerHTML = `<div class="empty-state">Need at least 2 months with guest data to plot a trend.</div>`;
+    return;
+  }
+  const w = 900, h = 200, padL = 46, padR = 16, padT = 16, padB = 28;
+  const innerW = w - padL - padR, innerH = h - padT - padB;
+  const maxV = Math.max(...known.map(p => p.value), 0.01);
+  const n = points.length;
+  const x = i => padL + (n === 1 ? innerW/2 : (innerW * i) / (n - 1));
+  const y = v => padT + innerH - (v / maxV) * innerH;
+
+  let pathD = "";
+  let started = false;
+  points.forEach((p, i) => {
+    if (p.value === null) { started = false; return; }
+    const cmd = started ? "L" : "M";
+    pathD += `${cmd}${x(i).toFixed(1)},${y(p.value).toFixed(1)} `;
+    started = true;
+  });
+
+  const gridLines = [0, 0.25, 0.5, 0.75, 1].map(f => {
+    const gy = padT + innerH - f * innerH;
+    return `<line x1="${padL}" y1="${gy}" x2="${w-padR}" y2="${gy}" stroke="var(--border)" stroke-width="1"/>
+      <text x="${padL - 8}" y="${gy + 4}" font-size="10" fill="var(--text-muted)" text-anchor="end">${eur(maxV * f)}</text>`;
+  }).join("");
+
+  const dots = points.map((p, i) => {
+    if (p.value === null) return "";
+    return `<circle cx="${x(i).toFixed(1)}" cy="${y(p.value).toFixed(1)}" r="3.5" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="1.5"
+      data-tip="${MONTH_LABELS[p.month]}: ${eur(p.value)} per guest" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)" style="cursor:pointer;"></circle>`;
+  }).join("");
+
+  const labels = points.map((p, i) => {
+    if (i !== 0 && i !== n-1 && n > 6 && i % 2 !== 0) return "";
+    return `<text x="${x(i).toFixed(1)}" y="${h - 8}" font-size="10" fill="var(--text-muted)" text-anchor="middle">${monthShortLabel(p.month)}</text>`;
+  }).join("");
+
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" style="width:100%; height:180px; overflow:visible;">
+    ${gridLines}
+    <path d="${pathD.trim()}" fill="none" stroke="var(--series-1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}
+    ${labels}
+  </svg>`;
 }
 
 function selectCompareMonth(m) {
