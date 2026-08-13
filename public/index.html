@@ -75,10 +75,14 @@
 
     <div class="kpi-group kpi-group-results">
       <div class="kpi-group-heading"><span class="kpi-group-dot"></span>Results</div>
-      <div class="kpi-row" id="compareKpiRowGuests" style="grid-template-columns: repeat(2,1fr); margin-bottom:14px;"></div>
-      <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px; font-weight:600;">Total spend per guest, by month</div>
-      <div id="spendPerGuestChart"></div>
+      <div class="kpi-row" id="compareKpiRowGuests" style="grid-template-columns: repeat(2,1fr);"></div>
     </div>
+
+    <section id="spendPerGuestSection" style="display:none;">
+      <h2>Total spend per guest, by month</h2>
+      <p class="desc">Combined marketing spend (Meta Ads + Mailchimp + Kyte + Triston) divided by guest visits, for each month in the selected range. Shown only when the range covers more than one month — pick "All time" or a wider From/To range above to see it.</p>
+      <div id="spendPerGuestChart"></div>
+    </section>
 
     <section>
       <h2 id="compareChartTitle">Reach vs. engagement, by month — both channels</h2>
@@ -698,29 +702,31 @@ function spendPerGuestForMonth(m) {
 }
 
 function renderSpendPerGuestChart(months) {
+  const section = document.getElementById("spendPerGuestSection");
   const el = document.getElementById("spendPerGuestChart");
-  if (!el) return;
+  if (!section || !el) return;
+
+  // Column chart only makes sense across multiple months — hide it entirely when a
+  // single individual month is selected (via the month buttons / detail drill-down).
+  if (months.length < 2) {
+    section.style.display = "none";
+    return;
+  }
+
   const points = months.map(m => ({ month: m, value: spendPerGuestForMonth(m) }));
   const known = points.filter(p => p.value !== null);
   if (known.length < 2) {
-    el.innerHTML = `<div class="empty-state">Need at least 2 months with guest data to plot a trend.</div>`;
+    section.style.display = "none";
     return;
   }
-  const w = 900, h = 200, padL = 46, padR = 16, padT = 16, padB = 28;
+  section.style.display = "";
+
+  const w = 900, h = 220, padL = 46, padR = 16, padT = 16, padB = 28;
   const innerW = w - padL - padR, innerH = h - padT - padB;
   const maxV = Math.max(...known.map(p => p.value), 0.01);
   const n = points.length;
-  const x = i => padL + (n === 1 ? innerW/2 : (innerW * i) / (n - 1));
-  const y = v => padT + innerH - (v / maxV) * innerH;
-
-  let pathD = "";
-  let started = false;
-  points.forEach((p, i) => {
-    if (p.value === null) { started = false; return; }
-    const cmd = started ? "L" : "M";
-    pathD += `${cmd}${x(i).toFixed(1)},${y(p.value).toFixed(1)} `;
-    started = true;
-  });
+  const gap = 10;
+  const colW = (innerW - gap * (n - 1)) / n;
 
   const gridLines = [0, 0.25, 0.5, 0.75, 1].map(f => {
     const gy = padT + innerH - f * innerH;
@@ -728,21 +734,27 @@ function renderSpendPerGuestChart(months) {
       <text x="${padL - 8}" y="${gy + 4}" font-size="10" fill="var(--text-muted)" text-anchor="end">${eur(maxV * f)}</text>`;
   }).join("");
 
-  const dots = points.map((p, i) => {
-    if (p.value === null) return "";
-    return `<circle cx="${x(i).toFixed(1)}" cy="${y(p.value).toFixed(1)}" r="3.5" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="1.5"
-      data-tip="${MONTH_LABELS[p.month]}: ${eur(p.value)} per guest" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)" style="cursor:pointer;"></circle>`;
+  const bars = points.map((p, i) => {
+    const bx = padL + i * (colW + gap);
+    if (p.value === null) {
+      return `<text x="${bx + colW/2}" y="${padT + innerH - 4}" font-size="10" fill="var(--text-muted)" text-anchor="middle">—</text>`;
+    }
+    const barH = Math.max((p.value / maxV) * innerH, 2);
+    const by = padT + innerH - barH;
+    return `
+      <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${colW.toFixed(1)}" height="${barH.toFixed(1)}" rx="4" fill="var(--series-1)"
+        data-tip="${MONTH_LABELS[p.month]}: ${eur(p.value)} per guest" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)" style="cursor:pointer;"></rect>
+      <text x="${(bx + colW/2).toFixed(1)}" y="${(by - 6).toFixed(1)}" font-size="10" fill="var(--text-secondary)" text-anchor="middle" font-weight="600">${eur(p.value)}</text>`;
   }).join("");
 
   const labels = points.map((p, i) => {
-    if (i !== 0 && i !== n-1 && n > 6 && i % 2 !== 0) return "";
-    return `<text x="${x(i).toFixed(1)}" y="${h - 8}" font-size="10" fill="var(--text-muted)" text-anchor="middle">${monthShortLabel(p.month)}</text>`;
+    const bx = padL + i * (colW + gap);
+    return `<text x="${(bx + colW/2).toFixed(1)}" y="${h - 8}" font-size="10" fill="var(--text-muted)" text-anchor="middle">${monthShortLabel(p.month)}</text>`;
   }).join("");
 
-  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" style="width:100%; height:180px; overflow:visible;">
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" style="width:100%; height:200px; overflow:visible;">
     ${gridLines}
-    <path d="${pathD.trim()}" fill="none" stroke="var(--series-1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-    ${dots}
+    ${bars}
     ${labels}
   </svg>`;
 }
