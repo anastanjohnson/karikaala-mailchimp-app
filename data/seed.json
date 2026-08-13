@@ -20,7 +20,8 @@
           "unsubscribes": 24,
           "revenue": 0
         }
-      ]
+      ],
+      "invoice": 116.03
     },
     "2026-02": {
       "campaigns": [
@@ -51,7 +52,8 @@
           "unsubscribes": 1,
           "revenue": 0
         }
-      ]
+      ],
+      "invoice": 116.03
     },
     "2026-03": {
       "campaigns": [
@@ -91,7 +93,8 @@
           "unsubscribes": 10,
           "revenue": 0
         }
-      ]
+      ],
+      "invoice": 116.03
     },
     "2026-04": {
       "campaigns": [
@@ -122,7 +125,8 @@
           "unsubscribes": 21,
           "revenue": 0
         }
-      ]
+      ],
+      "invoice": 214.5
     },
     "2026-05": {
       "campaigns": [
@@ -189,7 +193,8 @@
           "unsubscribes": 2,
           "revenue": 0
         }
-      ]
+      ],
+      "invoice": 146.38
     },
     "2026-06": {
       "campaigns": [
@@ -202,10 +207,12 @@
           "unsubscribes": 63,
           "revenue": 0
         }
-      ]
+      ],
+      "invoice": 170.77
     },
     "2026-07": {
-      "campaigns": []
+      "campaigns": [],
+      "invoice": 113.05
     },
     "2026-08": {
       "campaigns": [
@@ -218,7 +225,8 @@
           "unsubscribes": 15,
           "revenue": 0
         }
-      ]
+      ],
+      "invoice": 0
     }
   },
   "meta": {
