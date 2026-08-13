@@ -25,6 +25,7 @@ function readAll() {
   const data = JSON.parse(raw || "{}");
   if (!data.mailchimp) data.mailchimp = {};
   if (!data.meta) data.meta = {};
+  if (!data.guests) data.guests = {};
   return data;
 }
 
@@ -98,6 +99,19 @@ function setInvoice(channel, month, amount) {
   return data[channel][month];
 }
 
+function getGuests() {
+  const data = readAll();
+  return data.guests || {};
+}
+
+function setGuests(month, count) {
+  const data = readAll();
+  if (!data.guests) data.guests = {};
+  data.guests[month] = Number(count) || 0;
+  writeAll(data);
+  return data.guests[month];
+}
+
 module.exports = {
   CHANNELS,
   ensureDataFile,
@@ -110,4 +124,6 @@ module.exports = {
   updateItem,
   deleteItem,
   setInvoice,
+  getGuests,
+  setGuests,
 };

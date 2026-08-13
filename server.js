@@ -81,6 +81,17 @@ app.put("/api/:channel/months/:month/invoice", validChannel, requireAuth, (req, 
   res.json(saved);
 });
 
+// Monthly guest visit counts (restaurant-wide, not tied to a marketing channel)
+app.get("/api/guests/months", (req, res) => {
+  res.json(db.getGuests());
+});
+
+app.put("/api/guests/months/:month", requireAuth, (req, res) => {
+  const amount = Number((req.body || {}).guests);
+  const saved = db.setGuests(req.params.month, isNaN(amount) ? 0 : amount);
+  res.json({ month: req.params.month, guests: saved });
+});
+
 app.delete("/api/:channel/months/:month", validChannel, requireAuth, (req, res) => {
   db.deleteMonth(req.params.channel, req.params.month);
   res.json({ ok: true });
