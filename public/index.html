@@ -75,7 +75,7 @@
 
     <section>
       <h2>Monthly summary — side by side</h2>
-      <p class="desc">Mailchimp spend is its monthly plan invoice (a flat subscription fee, not billed per campaign) — pulled from your Mailchimp billing history. Click a month — in the chart above or a row below — to see that month's detail.</p>
+      <p class="desc">Mailchimp spend is its monthly plan invoice (a flat subscription fee, not billed per campaign) — pulled from your Mailchimp billing history. "$/guest" and "€/guest" columns show how much was spent on that channel per guest visit that month, using the guest counts entered in Admin. Click a month — in the chart above or a row below — to see that month's detail.</p>
       <div id="compareTable"></div>
     </section>
 
@@ -105,6 +105,7 @@ const CHANNEL_META = {
   meta: { itemKey: "ads", label: "Meta Ads", metric: "viewers", metricLabel: "Reach" },
 };
 let DATA = { mailchimp: {}, meta: {} };
+let GUESTS = {};
 let MONTHS = { mailchimp: [], meta: [] };
 const MONTH_LABELS = {};
 let channel = "mailchimp";
@@ -122,12 +123,14 @@ function labelFor(m) {
 }
 
 async function loadData() {
-  const [mc, meta] = await Promise.all([
+  const [mc, meta, guests] = await Promise.all([
     fetch("/api/mailchimp/months").then(r=>r.json()),
     fetch("/api/meta/months").then(r=>r.json()),
+    fetch("/api/guests/months").then(r=>r.json()),
   ]);
   DATA.mailchimp = mc;
   DATA.meta = meta;
+  GUESTS = guests || {};
   MONTHS.mailchimp = Object.keys(mc).sort();
   MONTHS.meta = Object.keys(meta).sort();
   [...MONTHS.mailchimp, ...MONTHS.meta].forEach(m => MONTH_LABELS[m] = labelFor(m));
@@ -180,6 +183,18 @@ function computeKpisMeta(items) {
 function invoiceFor(month) {
   const md = DATA.mailchimp[month];
   return md && md.invoice ? Number(md.invoice) : 0;
+}
+
+function guestsFor(month) {
+  return Number(GUESTS[month]) || 0;
+}
+
+function perGuest(spend, guests) {
+  return guests > 0 ? spend / guests : null;
+}
+function perGuestLabel(spend, guests, fmtFn) {
+  const v = perGuest(spend, guests);
+  return v === null ? "—" : fmtFn(v);
 }
 
 function prevMonthKey(ch, m) {
@@ -461,6 +476,7 @@ function renderCompare() {
     return acc;
   }, {spend:0, viewers:0, results:0});
   const totalSpend = metaTotals.spend + mcTotals.invoice;
+  const totalGuests = months.reduce((sum,m) => sum + guestsFor(m), 0);
 
   document.getElementById("compareKpiRow").innerHTML = [
     ["Total marketing spend", eur(totalSpend)],
@@ -469,10 +485,12 @@ function renderCompare() {
     ["Meta Ads — total reach", fmt(metaTotals.viewers)],
     ["Mailchimp — total opens", fmt(mcTotals.opens)],
     ["Mailchimp — total clicks", fmt(mcTotals.clicks)],
+    ["Total guest visits", fmt(totalGuests)],
+    ["Total spend per guest", perGuestLabel(totalSpend, totalGuests, eur)],
   ].map(([label,value]) => `
     <div class="kpi"><div class="label">${label}</div><div class="value">${value}</div></div>
   `).join("");
-  document.getElementById("compareKpiRow").style.gridTemplateColumns = "repeat(6, 1fr)";
+  document.getElementById("compareKpiRow").style.gridTemplateColumns = "repeat(4, 1fr)";
 
   // dual bar chart, independently scaled
   const mcVals = months.map(m => computeKpisMailchimp(itemsFor("mailchimp", m)).opens);
@@ -500,6 +518,7 @@ function renderCompare() {
     const mck = computeKpisMailchimp(itemsFor("mailchimp", m));
     const metak = computeKpisMeta(itemsFor("meta", m));
     const mcSpend = invoiceFor(m);
+    const guests = guestsFor(m);
     const isSel = m === compareMonth;
     return `
     <tr class="compare-row ${isSel ? 'selected-row' : ''}" style="cursor:pointer;" onclick="selectCompareMonth('${m}')">
@@ -507,19 +526,26 @@ function renderCompare() {
       <td class="num">${fmt(mck.opens)}</td>
       <td class="num">${fmt(mck.clicks)}</td>
       <td class="num">${usd(mcSpend)}</td>
+      <td class="num">${perGuestLabel(mcSpend, guests, usd)}</td>
       <td class="num">${fmt(metak.viewers)}</td>
       <td class="num">${fmt(metak.results)}</td>
       <td class="num">${eur(metak.spend)}</td>
+      <td class="num">${perGuestLabel(metak.spend, guests, eur)}</td>
+      <td class="num">${guests ? fmt(guests) : "—"}</td>
       <td class="num">${eur(metak.spend + mcSpend)}</td>
+      <td class="num">${perGuestLabel(metak.spend + mcSpend, guests, eur)}</td>
     </tr>`;
   }).join("");
   document.getElementById("compareTable").innerHTML = `
+    <div style="overflow-x:auto;">
     <table><thead><tr>
       <th>Month</th>
-      <th class="num">Mailchimp opens</th><th class="num">Mailchimp clicks</th><th class="num">Mailchimp spend</th>
-      <th class="num">Meta reach</th><th class="num">Meta results</th><th class="num">Meta spend</th>
-      <th class="num">Total spend</th>
-    </tr></thead><tbody>${rows}</tbody></table>`;
+      <th class="num">Mailchimp opens</th><th class="num">Mailchimp clicks</th><th class="num">Mailchimp spend</th><th class="num">Mailchimp $/guest</th>
+      <th class="num">Meta reach</th><th class="num">Meta results</th><th class="num">Meta spend</th><th class="num">Meta €/guest</th>
+      <th class="num">Guests</th>
+      <th class="num">Total spend</th><th class="num">Total €/guest</th>
+    </tr></thead><tbody>${rows}</tbody></table>
+    </div>`;
 
   renderCompareDetail();
 }
@@ -543,15 +569,19 @@ function renderCompareDetail() {
   const mck = computeKpisMailchimp(mcItems);
   const metak = computeKpisMeta(metaItems);
   const mcSpend = invoiceFor(compareMonth);
+  const guests = guestsFor(compareMonth);
 
   document.getElementById("compareDetailKpis").innerHTML = [
     ["Mailchimp opens", fmt(mck.opens)],
     ["Mailchimp spend (invoice)", usd(mcSpend)],
     ["Meta reach", fmt(metak.viewers)],
     ["Meta spend", eur(metak.spend)],
+    ["Guest visits", guests ? fmt(guests) : "—"],
+    ["Total spend per guest", perGuestLabel(metak.spend + mcSpend, guests, eur)],
   ].map(([label,value]) => `
     <div class="kpi"><div class="label">${label}</div><div class="value">${value}</div></div>
   `).join("");
+  document.getElementById("compareDetailKpis").style.gridTemplateColumns = "repeat(3, 1fr)";
 
   const mcEl = document.getElementById("compareDetailMailchimp");
   if (!mcItems.length) {

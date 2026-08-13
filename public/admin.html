@@ -30,6 +30,17 @@
     </header>
 
     <section>
+      <h2>Guest visits (restaurant-wide)</h2>
+      <p class="desc">Total guest visits for a month — used to calculate marketing spend per guest across all channels. Not tied to Mailchimp or Meta.</p>
+      <div class="controls">
+        <select id="guestMonthSelect"></select>
+        <input id="guestInput" type="number" step="1" placeholder="0" style="width:140px;">
+        <button onclick="saveGuests()">Save guest count</button>
+        <span id="guestSaved" style="font-size:12px; color:var(--status-good); display:none;">Saved ✓</span>
+      </div>
+    </section>
+
+    <section>
       <h2>Channel</h2>
       <p class="desc">Pick which data you're editing.</p>
       <div class="channel-tabs">
@@ -134,6 +145,43 @@ async function showEditor() {
   document.getElementById("loginBox").style.display = "none";
   document.getElementById("editor").style.display = "block";
   setChannel("mailchimp");
+  loadGuestsSection();
+}
+
+let guestMonth = null;
+let GUESTS_ALL = {};
+
+async function loadGuestsSection() {
+  const [mc, meta, guests] = await Promise.all([
+    fetch("/api/mailchimp/months").then(r=>r.json()),
+    fetch("/api/meta/months").then(r=>r.json()),
+    fetch("/api/guests/months").then(r=>r.json()),
+  ]);
+  GUESTS_ALL = guests || {};
+  const allMonths = Array.from(new Set([...Object.keys(mc), ...Object.keys(meta), ...Object.keys(GUESTS_ALL)])).sort();
+  if (!guestMonth || !allMonths.includes(guestMonth)) guestMonth = allMonths[allMonths.length - 1] || null;
+  const sel = document.getElementById("guestMonthSelect");
+  sel.innerHTML = allMonths.map(m => `<option value="${m}" ${m===guestMonth?'selected':''}>${m}</option>`).join("");
+  sel.onchange = e => { guestMonth = e.target.value; renderGuestInput(); };
+  renderGuestInput();
+}
+
+function renderGuestInput() {
+  document.getElementById("guestInput").value = guestMonth ? (GUESTS_ALL[guestMonth] || 0) : 0;
+  document.getElementById("guestSaved").style.display = "none";
+}
+
+async function saveGuests() {
+  if (!guestMonth) return;
+  const count = document.getElementById("guestInput").value;
+  await fetch(`/api/guests/months/${guestMonth}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ guests: count }),
+  });
+  await loadGuestsSection();
+  document.getElementById("guestMonthSelect").value = guestMonth;
+  document.getElementById("guestSaved").style.display = "inline";
 }
 
 function setChannel(ch) {
