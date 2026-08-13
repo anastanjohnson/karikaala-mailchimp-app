@@ -159,7 +159,7 @@
         },
         {
           "date": "May 5",
-          "name": "Vedan Meet & Greet \u2014 Ticket sold Emails",
+          "name": "Vedan Meet & Greet — Ticket sold Emails",
           "status": "sent",
           "opens": 22,
           "clicks": 6,
@@ -215,18 +215,8 @@
       "invoice": 113.05
     },
     "2026-08": {
-      "campaigns": [
-        {
-          "date": "Aug 12",
-          "name": "CHOZHA APERITIF Offer",
-          "status": "sent",
-          "opens": 453,
-          "clicks": 36,
-          "unsubscribes": 15,
-          "revenue": 0
-        }
-      ],
-      "invoice": 0
+      "campaigns": [],
+      "invoice": 113.0
     }
   },
   "meta": {
@@ -234,7 +224,7 @@
       "ads": [
         {
           "date": "Jan 23",
-          "name": "Valentine's teaser \u2014 Get more bookings",
+          "name": "Valentine's teaser — Get more bookings",
           "status": "paused",
           "resultType": "Link Clicks",
           "results": 151,
@@ -244,7 +234,7 @@
         },
         {
           "date": "Jan 22",
-          "name": "KARIKAALA Kultur & Genuss \u2014 Get more bookings",
+          "name": "KARIKAALA Kultur & Genuss — Get more bookings",
           "status": "paused",
           "resultType": "Link Clicks",
           "results": 401,
@@ -254,7 +244,7 @@
         },
         {
           "date": "Jan 22",
-          "name": "Sivappi Mocktail \u2014 Boosted post",
+          "name": "Sivappi Mocktail — Boosted post",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 118,
@@ -264,7 +254,7 @@
         },
         {
           "date": "Jan 7",
-          "name": "Pongal Festmahl \u2014 Boosted reel",
+          "name": "Pongal Festmahl — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 1603,
@@ -274,7 +264,7 @@
         },
         {
           "date": "Jan 7",
-          "name": "S\u00fcdindien Aromen \u2014 Get more bookings",
+          "name": "Südindien Aromen — Get more bookings",
           "status": "paused",
           "resultType": "Link Clicks",
           "results": 1370,
@@ -284,7 +274,7 @@
         },
         {
           "date": "Dec 31",
-          "name": "New Year Bookings \u2014 Website schedule",
+          "name": "New Year Bookings — Website schedule",
           "status": "completed",
           "resultType": "Website schedule",
           "results": 0,
@@ -294,7 +284,7 @@
         },
         {
           "date": "Dec 31",
-          "name": "Silvester Danke \u2014 Boosted reel",
+          "name": "Silvester Danke — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 545,
@@ -308,7 +298,7 @@
       "ads": [
         {
           "date": "Feb 19",
-          "name": "Rap-Star Ticket promo \u2014 Get more bookings",
+          "name": "Rap-Star Ticket promo — Get more bookings",
           "status": "paused",
           "resultType": "Link Clicks",
           "results": 980,
@@ -318,7 +308,7 @@
         },
         {
           "date": "Feb 5",
-          "name": "Valentinstag Date-Night \u2014 Boosted reel",
+          "name": "Valentinstag Date-Night — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 819,
@@ -328,7 +318,7 @@
         },
         {
           "date": "Feb 5",
-          "name": "Valentinstag Date-Night \u2014 Get more bookings",
+          "name": "Valentinstag Date-Night — Get more bookings",
           "status": "paused",
           "resultType": "Link Clicks",
           "results": 669,
@@ -338,7 +328,7 @@
         },
         {
           "date": "Jan 23",
-          "name": "Valentine's teaser \u2014 Get more bookings",
+          "name": "Valentine's teaser — Get more bookings",
           "status": "paused",
           "resultType": "Link Clicks",
           "results": 92,
@@ -348,7 +338,7 @@
         },
         {
           "date": "Jan 22",
-          "name": "KARIKAALA Kultur & Genuss \u2014 Get more bookings",
+          "name": "KARIKAALA Kultur & Genuss — Get more bookings",
           "status": "paused",
           "resultType": "Link Clicks",
           "results": 205,
@@ -362,7 +352,7 @@
       "ads": [
         {
           "date": "Mar 30",
-          "name": "Vaaheesan Tickets \u2014 Get more bookings",
+          "name": "Vaaheesan Tickets — Get more bookings",
           "status": "completed",
           "resultType": "Landing page views",
           "results": 478,
@@ -372,7 +362,7 @@
         },
         {
           "date": "Mar 25",
-          "name": "Rap Ceylon & Vaheesan \u2014 Website clicks",
+          "name": "Rap Ceylon & Vaheesan — Website clicks",
           "status": "completed",
           "resultType": "Landing page views",
           "results": 960,
@@ -382,7 +372,7 @@
         },
         {
           "date": "Mar 18",
-          "name": "Wiederer\u00f6ffnung 30% Rabatt \u2014 Boosted reel",
+          "name": "Wiedereröffnung 30% Rabatt — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 1011,
@@ -392,7 +382,7 @@
         },
         {
           "date": "Mar 18",
-          "name": "Chozha All You Can \u2014 Boosted reel",
+          "name": "Chozha All You Can — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 203,
@@ -402,7 +392,7 @@
         },
         {
           "date": "Mar 18",
-          "name": "Treue-Rabatt 30% \u2014 Boosted FB post",
+          "name": "Treue-Rabatt 30% — Boosted FB post",
           "status": "completed",
           "resultType": "Landing page views",
           "results": 178,
@@ -412,7 +402,7 @@
         },
         {
           "date": "Mar 17",
-          "name": "Sri Lanka Tapas \u2014 Website clicks",
+          "name": "Sri Lanka Tapas — Website clicks",
           "status": "paused",
           "resultType": "Landing page views",
           "results": 1219,
@@ -422,7 +412,7 @@
         },
         {
           "date": "Mar 13",
-          "name": "Re-Opening Countdown \u2014 Boosted reel",
+          "name": "Re-Opening Countdown — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 489,
@@ -432,7 +422,7 @@
         },
         {
           "date": "Mar 12",
-          "name": "Vorbereitungen \u2014 Boosted FB reel",
+          "name": "Vorbereitungen — Boosted FB reel",
           "status": "completed",
           "resultType": "ThruPlays",
           "results": 8754,
@@ -442,7 +432,7 @@
         },
         {
           "date": "Feb 19",
-          "name": "Rap-Star Ticket promo \u2014 Get more bookings",
+          "name": "Rap-Star Ticket promo — Get more bookings",
           "status": "paused",
           "resultType": "Link Clicks",
           "results": 1835,
@@ -456,7 +446,7 @@
       "ads": [
         {
           "date": "Apr 30",
-          "name": "Vedan Meet & Greet \u2014 Boosted post",
+          "name": "Vedan Meet & Greet — Boosted post",
           "status": "completed",
           "resultType": "Link Clicks",
           "results": 42,
@@ -466,7 +456,7 @@
         },
         {
           "date": "Apr 22",
-          "name": "Sri Lanka R\u00fcckzugsort \u2014 Get more bookings",
+          "name": "Sri Lanka Rückzugsort — Get more bookings",
           "status": "paused",
           "resultType": "Landing page views",
           "results": 406,
@@ -476,7 +466,7 @@
         },
         {
           "date": "Apr 17",
-          "name": "Weekend Tisch sichern \u2014 Get more bookings",
+          "name": "Weekend Tisch sichern — Get more bookings",
           "status": "completed",
           "resultType": "Landing page views",
           "results": 1461,
@@ -486,7 +476,7 @@
         },
         {
           "date": "Apr 10",
-          "name": "Kulinarische Vielfalt \u2014 Get more bookings",
+          "name": "Kulinarische Vielfalt — Get more bookings",
           "status": "paused",
           "resultType": "Landing page views",
           "results": 1834,
@@ -496,7 +486,7 @@
         },
         {
           "date": "Apr 9",
-          "name": "Truffle Naan \u2014 Boosted reel",
+          "name": "Truffle Naan — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 843,
@@ -506,7 +496,7 @@
         },
         {
           "date": "Mar 30",
-          "name": "Vaaheesan Tickets \u2014 Get more bookings",
+          "name": "Vaaheesan Tickets — Get more bookings",
           "status": "completed",
           "resultType": "Landing page views",
           "results": 737,
@@ -516,7 +506,7 @@
         },
         {
           "date": "Mar 25",
-          "name": "Rap Ceylon & Vaheesan \u2014 Website clicks",
+          "name": "Rap Ceylon & Vaheesan — Website clicks",
           "status": "completed",
           "resultType": "Landing page views",
           "results": 430,
@@ -526,7 +516,7 @@
         },
         {
           "date": "Mar 17",
-          "name": "Sri Lanka Tapas \u2014 Website clicks",
+          "name": "Sri Lanka Tapas — Website clicks",
           "status": "paused",
           "resultType": "Landing page views",
           "results": 1035,
@@ -540,7 +530,7 @@
       "ads": [
         {
           "date": "May 28",
-          "name": "Mango Chicken Curry \u2014 Boosted reel",
+          "name": "Mango Chicken Curry — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 245,
@@ -550,7 +540,7 @@
         },
         {
           "date": "May 27",
-          "name": "08/15-Restaurant? \u2014 Boosted reel",
+          "name": "08/15-Restaurant? — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 156,
@@ -560,7 +550,7 @@
         },
         {
           "date": "May 15",
-          "name": "May Remembrance Eelam \u2014 Boosted FB reel",
+          "name": "May Remembrance Eelam — Boosted FB reel",
           "status": "completed",
           "resultType": "ThruPlays",
           "results": 2872,
@@ -570,7 +560,7 @@
         },
         {
           "date": "May 13",
-          "name": "KARIKAALA x Vedan \u2014 Boosted reel",
+          "name": "KARIKAALA x Vedan — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 1012,
@@ -580,7 +570,7 @@
         },
         {
           "date": "May 12",
-          "name": "Dieses Gericht spaltet \u2014 Boosted reel",
+          "name": "Dieses Gericht spaltet — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 758,
@@ -590,7 +580,7 @@
         },
         {
           "date": "May 8",
-          "name": "All You Can Ex\"Beer\"ience \u2014 Boosted reel",
+          "name": "All You Can Ex\"Beer\"ience — Boosted reel",
           "status": "paused",
           "resultType": "Profile visits",
           "results": 3996,
@@ -600,7 +590,7 @@
         },
         {
           "date": "May 7",
-          "name": "Vedan Meet & Greet \u2014 Boosted post",
+          "name": "Vedan Meet & Greet — Boosted post",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 425,
@@ -610,7 +600,7 @@
         },
         {
           "date": "May 6",
-          "name": "Limited Tables Vedan \u2014 Boosted reel",
+          "name": "Limited Tables Vedan — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 86,
@@ -620,7 +610,7 @@
         },
         {
           "date": "May 4",
-          "name": "Hard Beats promo \u2014 Get more bookings",
+          "name": "Hard Beats promo — Get more bookings",
           "status": "paused",
           "resultType": "Landing page views",
           "results": 137,
@@ -630,7 +620,7 @@
         },
         {
           "date": "May 2",
-          "name": "Unvergesslicher Abend \u2014 Website clicks",
+          "name": "Unvergesslicher Abend — Website clicks",
           "status": "completed",
           "resultType": "Landing page views",
           "results": 323,
@@ -640,7 +630,7 @@
         },
         {
           "date": "May 1",
-          "name": "All You Can Ex\"Beer\"ience \u2014 Boosted reel",
+          "name": "All You Can Ex\"Beer\"ience — Boosted reel",
           "status": "paused",
           "resultType": "Profile visits",
           "results": 2408,
@@ -650,7 +640,7 @@
         },
         {
           "date": "May 1",
-          "name": "Triff Vedan pers\u00f6nlich \u2014 Get more bookings",
+          "name": "Triff Vedan persönlich — Get more bookings",
           "status": "completed",
           "resultType": "Landing page views",
           "results": 337,
@@ -660,7 +650,7 @@
         },
         {
           "date": "Apr 30",
-          "name": "Vedan Meet & Greet \u2014 Boosted post",
+          "name": "Vedan Meet & Greet — Boosted post",
           "status": "completed",
           "resultType": "Link Clicks",
           "results": 526,
@@ -670,7 +660,7 @@
         },
         {
           "date": "Apr 22",
-          "name": "Sri Lanka R\u00fcckzugsort \u2014 Get more bookings",
+          "name": "Sri Lanka Rückzugsort — Get more bookings",
           "status": "paused",
           "resultType": "Landing page views",
           "results": 3339,
@@ -680,7 +670,7 @@
         },
         {
           "date": "Apr 10",
-          "name": "Kulinarische Vielfalt \u2014 Get more bookings",
+          "name": "Kulinarische Vielfalt — Get more bookings",
           "status": "paused",
           "resultType": "Landing page views",
           "results": 4184,
@@ -690,7 +680,7 @@
         },
         {
           "date": "Mar 30",
-          "name": "Vaaheesan Tickets \u2014 Get more bookings",
+          "name": "Vaaheesan Tickets — Get more bookings",
           "status": "completed",
           "resultType": "Landing page views",
           "results": 74,
@@ -700,7 +690,7 @@
         },
         {
           "date": "Mar 25",
-          "name": "Rap Ceylon & Vaheesan \u2014 Website clicks",
+          "name": "Rap Ceylon & Vaheesan — Website clicks",
           "status": "completed",
           "resultType": "Landing page views",
           "results": 66,
@@ -714,7 +704,7 @@
       "ads": [
         {
           "date": "Jun 29",
-          "name": "Summer Cultural Night ticket \u2014 Boosted reel",
+          "name": "Summer Cultural Night ticket — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 38,
@@ -724,7 +714,7 @@
         },
         {
           "date": "Jun 29",
-          "name": "Sommer schmeckt besser \u2014 Boosted reel",
+          "name": "Sommer schmeckt besser — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 43,
@@ -734,7 +724,7 @@
         },
         {
           "date": "Jun 25",
-          "name": "WM2026 Takeaway 20% \u2014 Promote contact info",
+          "name": "WM2026 Takeaway 20% — Promote contact info",
           "status": "paused",
           "resultType": "Link Clicks",
           "results": 9,
@@ -744,7 +734,7 @@
         },
         {
           "date": "Jun 24",
-          "name": "Kulturabend \u2014 Get more bookings",
+          "name": "Kulturabend — Get more bookings",
           "status": "paused",
           "resultType": "Landing page views",
           "results": 262,
@@ -754,7 +744,7 @@
         },
         {
           "date": "Jun 20",
-          "name": "Terrasse sichern \u2014 Boosted reel",
+          "name": "Terrasse sichern — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 424,
@@ -764,7 +754,7 @@
         },
         {
           "date": "Jun 19",
-          "name": "Mehr Sommer pro Tisch \u2014 Boosted reel",
+          "name": "Mehr Sommer pro Tisch — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 1049,
@@ -774,7 +764,7 @@
         },
         {
           "date": "Jun 19",
-          "name": "Cocktail/Mocktail gratis \u2014 Get more bookings",
+          "name": "Cocktail/Mocktail gratis — Get more bookings",
           "status": "paused",
           "resultType": "Landing page views",
           "results": 149,
@@ -784,7 +774,7 @@
         },
         {
           "date": "Jun 19",
-          "name": "Sommerstart \u2014 Boosted reel",
+          "name": "Sommerstart — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 85,
@@ -794,7 +784,7 @@
         },
         {
           "date": "Jun 18",
-          "name": "35\u20ac Summer Experience \u2014 Get more bookings",
+          "name": "35€ Summer Experience — Get more bookings",
           "status": "paused",
           "resultType": "Landing page views",
           "results": 236,
@@ -804,7 +794,7 @@
         },
         {
           "date": "Jun 17",
-          "name": "Mridangam & Thavil Kulturabend \u2014 Boosted reel",
+          "name": "Mridangam & Thavil Kulturabend — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 150,
@@ -814,7 +804,7 @@
         },
         {
           "date": "Jun 16",
-          "name": "Mango Chicken Curry \u2014 Boosted reel",
+          "name": "Mango Chicken Curry — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 119,
@@ -824,7 +814,7 @@
         },
         {
           "date": "Jun 16",
-          "name": "Newsletter Rabattcode \u2014 New customers",
+          "name": "Newsletter Rabattcode — New customers",
           "status": "paused",
           "resultType": "Meta leads",
           "results": 0,
@@ -834,7 +824,7 @@
         },
         {
           "date": "Jun 12",
-          "name": "Mango Chicken Curry \u2014 Boosted reel",
+          "name": "Mango Chicken Curry — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 108,
@@ -844,7 +834,7 @@
         },
         {
           "date": "Jun 11",
-          "name": "Newsletter Rabattcode \u2014 New customers",
+          "name": "Newsletter Rabattcode — New customers",
           "status": "paused",
           "resultType": "Meta leads",
           "results": 0,
@@ -854,7 +844,7 @@
         },
         {
           "date": "Jun 10",
-          "name": "Mehr Sommer pro Tisch \u2014 Boosted reel",
+          "name": "Mehr Sommer pro Tisch — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 490,
@@ -864,7 +854,7 @@
         },
         {
           "date": "Jun 10",
-          "name": "Summer Terrace Experience \u2014 Get more bookings",
+          "name": "Summer Terrace Experience — Get more bookings",
           "status": "active",
           "resultType": "Landing page views",
           "results": 1866,
@@ -874,7 +864,7 @@
         },
         {
           "date": "Jun 5",
-          "name": "KARIKAALA x Vedan \u2014 Boosted reel",
+          "name": "KARIKAALA x Vedan — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 318,
@@ -884,7 +874,7 @@
         },
         {
           "date": "Jun 5",
-          "name": "Firmen-Event \u2014 Boosted reel",
+          "name": "Firmen-Event — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 154,
@@ -894,7 +884,7 @@
         },
         {
           "date": "Jun 3",
-          "name": "\u00dcber 100 Gerichte \u2014 Boosted FB reel",
+          "name": "Über 100 Gerichte — Boosted FB reel",
           "status": "completed",
           "resultType": "Link Clicks",
           "results": 6,
@@ -904,7 +894,7 @@
         },
         {
           "date": "May 28",
-          "name": "Mango Chicken Curry \u2014 Boosted reel",
+          "name": "Mango Chicken Curry — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 249,
@@ -918,7 +908,7 @@
       "ads": [
         {
           "date": "Jul 21",
-          "name": "Ferienangebot Baby Bee \u2014 Boosted post",
+          "name": "Ferienangebot Baby Bee — Boosted post",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 38,
@@ -928,7 +918,7 @@
         },
         {
           "date": "Jul 21",
-          "name": "All You Can Experience 35\u20ac \u2014 Boosted post",
+          "name": "All You Can Experience 35€ — Boosted post",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 36,
@@ -938,7 +928,7 @@
         },
         {
           "date": "Jul 16",
-          "name": "Ferienstart Eis \u2014 Boosted reel",
+          "name": "Ferienstart Eis — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 172,
@@ -948,7 +938,7 @@
         },
         {
           "date": "Jul 16",
-          "name": "Cocktail/Mocktail bis Ende Juli \u2014 Get more bookings",
+          "name": "Cocktail/Mocktail bis Ende Juli — Get more bookings",
           "status": "active",
           "resultType": "Landing page views",
           "results": 681,
@@ -958,7 +948,7 @@
         },
         {
           "date": "Jul 12",
-          "name": "Summer Vibes \u2014 Boosted reel",
+          "name": "Summer Vibes — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 26,
@@ -968,7 +958,7 @@
         },
         {
           "date": "Jul 9",
-          "name": "Summer Vibes \u2014 Boosted reel",
+          "name": "Summer Vibes — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 24,
@@ -978,7 +968,7 @@
         },
         {
           "date": "Jul 6",
-          "name": "Montag Terrasse \u2014 Boosted reel",
+          "name": "Montag Terrasse — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 384,
@@ -988,7 +978,7 @@
         },
         {
           "date": "Jul 3",
-          "name": "Cocktail gratis + Fassbiere \u2014 Get more bookings",
+          "name": "Cocktail gratis + Fassbiere — Get more bookings",
           "status": "paused",
           "resultType": "Landing page views",
           "results": 19,
@@ -998,7 +988,7 @@
         },
         {
           "date": "Jul 1",
-          "name": "Summer Night Mridangam & Thavil \u2014 Boosted reel",
+          "name": "Summer Night Mridangam & Thavil — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 214,
@@ -1008,7 +998,7 @@
         },
         {
           "date": "Jun 29",
-          "name": "Summer Cultural Night ticket \u2014 Boosted reel",
+          "name": "Summer Cultural Night ticket — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 55,
@@ -1018,7 +1008,7 @@
         },
         {
           "date": "Jun 29",
-          "name": "Sommer schmeckt besser \u2014 Boosted reel",
+          "name": "Sommer schmeckt besser — Boosted reel",
           "status": "completed",
           "resultType": "Profile visits",
           "results": 115,
@@ -1028,7 +1018,7 @@
         },
         {
           "date": "Jun 24",
-          "name": "Kulturabend \u2014 Get more bookings",
+          "name": "Kulturabend — Get more bookings",
           "status": "paused",
           "resultType": "Landing page views",
           "results": 185,
@@ -1038,7 +1028,7 @@
         },
         {
           "date": "Jun 18",
-          "name": "35\u20ac Summer Experience \u2014 Get more bookings",
+          "name": "35€ Summer Experience — Get more bookings",
           "status": "paused",
           "resultType": "Landing page views",
           "results": 95,
@@ -1048,13 +1038,27 @@
         },
         {
           "date": "Jun 10",
-          "name": "Summer Terrace Experience \u2014 Get more bookings",
+          "name": "Summer Terrace Experience — Get more bookings",
           "status": "active",
           "resultType": "Landing page views",
           "results": 3665,
           "views": 68835,
           "viewers": 52215,
           "spend": 153.89
+        }
+      ]
+    },
+    "2026-08": {
+      "ads": [
+        {
+          "date": "Aug 12",
+          "name": "August ad spend",
+          "status": "completed",
+          "resultType": "N/A",
+          "results": 0,
+          "views": 0,
+          "viewers": 0,
+          "spend": 332.0
         }
       ]
     }
@@ -1066,6 +1070,7 @@
     "2026-04": 1323,
     "2026-05": 1600,
     "2026-06": 880,
-    "2026-07": 1177
+    "2026-07": 1177,
+    "2026-08": 446
   }
 }
