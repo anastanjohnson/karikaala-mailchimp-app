@@ -65,7 +65,7 @@
 
     <section>
       <h2>Monthly summary — side by side</h2>
-      <p class="desc">Spend is Meta Ads only (Mailchimp is a flat subscription fee, not billed per campaign). Click a month — in the chart above or a row below — to see that month's detail.</p>
+      <p class="desc">Mailchimp spend is its monthly plan invoice (a flat subscription fee, not billed per campaign) — pulled from your Mailchimp billing history. Click a month — in the chart above or a row below — to see that month's detail.</p>
       <div id="compareTable"></div>
     </section>
 
@@ -167,6 +167,11 @@ function computeKpisMeta(items) {
   return { spend, views, viewers, results, active, costPerResult, count: items.length };
 }
 
+function invoiceFor(month) {
+  const md = DATA.mailchimp[month];
+  return md && md.invoice ? Number(md.invoice) : 0;
+}
+
 function prevMonthKey(ch, m) {
   const idx = MONTHS[ch].indexOf(m);
   return idx > 0 ? MONTHS[ch][idx-1] : null;
@@ -190,15 +195,21 @@ function renderKpis(items, month) {
   if (channel === "mailchimp") {
     const k = computeKpisMailchimp(items);
     const pk = pm && DATA.mailchimp[pm] ? computeKpisMailchimp(itemsFor("mailchimp", pm)) : null;
+    const inv = invoiceFor(month);
+    const pInv = pm ? invoiceFor(pm) : 0;
+    const costPerOpen = k.opens ? (inv / k.opens) : 0;
+    row.style.gridTemplateColumns = "repeat(7, 1fr)";
     tiles = [
+      ["Monthly spend (invoice)", usd(inv), pm ? deltaHtml(inv, pInv, pLabel, true) : ""],
       ["Total opens", fmt(k.opens), pk ? deltaHtml(k.opens, pk.opens, pLabel) : ""],
       ["Total clicks", fmt(k.clicks), pk ? deltaHtml(k.clicks, pk.clicks, pLabel) : ""],
       ["Unsubscribes", fmt(k.unsubscribes), pk ? deltaHtml(k.unsubscribes, pk.unsubscribes, pLabel, true) : ""],
-      ["Revenue", usd(k.revenue), pk ? deltaHtml(k.revenue, pk.revenue, pLabel) : ""],
+      ["Cost per open", usd(costPerOpen), ""],
       ["Click-to-open rate", k.ctr.toFixed(1) + "%", ""],
       ["Campaigns this month", String(k.count), `<div class="delta">${k.sent} sent</div>`]
     ];
   } else {
+    row.style.gridTemplateColumns = "";
     const k = computeKpisMeta(items);
     const pk = pm && DATA.meta[pm] ? computeKpisMeta(itemsFor("meta", pm)) : null;
     tiles = [
@@ -383,22 +394,27 @@ function renderCompare() {
   const mcTotals = MONTHS.mailchimp.reduce((acc,m)=>{
     const k = computeKpisMailchimp(itemsFor("mailchimp", m));
     acc.opens += k.opens; acc.clicks += k.clicks; acc.revenue += k.revenue;
+    acc.invoice += invoiceFor(m);
     return acc;
-  }, {opens:0, clicks:0, revenue:0});
+  }, {opens:0, clicks:0, revenue:0, invoice:0});
   const metaTotals = MONTHS.meta.reduce((acc,m)=>{
     const k = computeKpisMeta(itemsFor("meta", m));
     acc.spend += k.spend; acc.viewers += k.viewers; acc.results += k.results;
     return acc;
   }, {spend:0, viewers:0, results:0});
+  const totalSpend = metaTotals.spend + mcTotals.invoice;
 
   document.getElementById("compareKpiRow").innerHTML = [
-    ["Meta Ads — total spend", eur(metaTotals.spend)],
+    ["Total marketing spend", eur(totalSpend)],
+    ["Meta Ads — spend", eur(metaTotals.spend)],
+    ["Mailchimp — spend (invoices)", usd(mcTotals.invoice)],
     ["Meta Ads — total reach", fmt(metaTotals.viewers)],
     ["Mailchimp — total opens", fmt(mcTotals.opens)],
     ["Mailchimp — total clicks", fmt(mcTotals.clicks)],
   ].map(([label,value]) => `
     <div class="kpi"><div class="label">${label}</div><div class="value">${value}</div></div>
   `).join("");
+  document.getElementById("compareKpiRow").style.gridTemplateColumns = "repeat(6, 1fr)";
 
   // dual bar chart, independently scaled
   const mcVals = months.map(m => computeKpisMailchimp(itemsFor("mailchimp", m)).opens);
@@ -425,22 +441,26 @@ function renderCompare() {
   const rows = months.map(m => {
     const mck = computeKpisMailchimp(itemsFor("mailchimp", m));
     const metak = computeKpisMeta(itemsFor("meta", m));
+    const mcSpend = invoiceFor(m);
     const isSel = m === compareMonth;
     return `
     <tr class="compare-row ${isSel ? 'selected-row' : ''}" style="cursor:pointer;" onclick="selectCompareMonth('${m}')">
       <td>${MONTH_LABELS[m]}</td>
       <td class="num">${fmt(mck.opens)}</td>
       <td class="num">${fmt(mck.clicks)}</td>
+      <td class="num">${usd(mcSpend)}</td>
       <td class="num">${fmt(metak.viewers)}</td>
       <td class="num">${fmt(metak.results)}</td>
       <td class="num">${eur(metak.spend)}</td>
+      <td class="num">${eur(metak.spend + mcSpend)}</td>
     </tr>`;
   }).join("");
   document.getElementById("compareTable").innerHTML = `
     <table><thead><tr>
       <th>Month</th>
-      <th class="num">Mailchimp opens</th><th class="num">Mailchimp clicks</th>
+      <th class="num">Mailchimp opens</th><th class="num">Mailchimp clicks</th><th class="num">Mailchimp spend</th>
       <th class="num">Meta reach</th><th class="num">Meta results</th><th class="num">Meta spend</th>
+      <th class="num">Total spend</th>
     </tr></thead><tbody>${rows}</tbody></table>`;
 
   renderCompareDetail();
@@ -464,10 +484,11 @@ function renderCompareDetail() {
   const metaItems = itemsFor("meta", compareMonth);
   const mck = computeKpisMailchimp(mcItems);
   const metak = computeKpisMeta(metaItems);
+  const mcSpend = invoiceFor(compareMonth);
 
   document.getElementById("compareDetailKpis").innerHTML = [
     ["Mailchimp opens", fmt(mck.opens)],
-    ["Mailchimp clicks", fmt(mck.clicks)],
+    ["Mailchimp spend (invoice)", usd(mcSpend)],
     ["Meta reach", fmt(metak.viewers)],
     ["Meta spend", eur(metak.spend)],
   ].map(([label,value]) => `

@@ -49,6 +49,16 @@
       </div>
     </section>
 
+    <section id="invoiceSection" style="display:none;">
+      <h2>Monthly Mailchimp invoice (spend)</h2>
+      <p class="desc">Mailchimp bills as a flat monthly subscription, not per campaign — enter that month's plan invoice total here to track it as "spend."</p>
+      <div class="controls">
+        <input id="invoiceInput" type="number" step="0.01" placeholder="0.00" style="width:140px;">
+        <button onclick="saveInvoice()">Save invoice amount</button>
+        <span id="invoiceSaved" style="font-size:12px; color:var(--status-good); display:none;">Saved ✓</span>
+      </div>
+    </section>
+
     <section>
       <h2 id="itemsTitle">Items for this month</h2>
       <p class="desc">Edit a field and press Save on that row, or add a new item below.</p>
@@ -144,6 +154,7 @@ async function loadData() {
   currentMonth = MONTHS[MONTHS.length - 1] || null;
   populateMonthSelect();
   renderItems();
+  renderInvoiceSection();
 }
 
 function populateMonthSelect() {
@@ -156,7 +167,29 @@ function populateMonthSelect() {
     if (m === currentMonth) opt.selected = true;
     sel.appendChild(opt);
   });
-  sel.onchange = e => { currentMonth = e.target.value; renderItems(); };
+  sel.onchange = e => { currentMonth = e.target.value; renderItems(); renderInvoiceSection(); };
+}
+
+function renderInvoiceSection() {
+  const sec = document.getElementById("invoiceSection");
+  if (channel !== "mailchimp" || !currentMonth) { sec.style.display = "none"; return; }
+  sec.style.display = "";
+  const monthData = DATA[currentMonth];
+  document.getElementById("invoiceInput").value = (monthData && monthData.invoice) || 0;
+  document.getElementById("invoiceSaved").style.display = "none";
+}
+
+async function saveInvoice() {
+  if (!currentMonth) return;
+  const amount = document.getElementById("invoiceInput").value;
+  await fetch(`/api/mailchimp/months/${currentMonth}/invoice`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ invoice: amount }),
+  });
+  await loadData();
+  document.getElementById("monthSelect").value = currentMonth;
+  document.getElementById("invoiceSaved").style.display = "inline";
 }
 
 async function addMonth() {
