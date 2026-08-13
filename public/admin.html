@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — KARIKAALA Mailchimp Dashboard</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="viz-root wrap" id="app">
+
+  <div class="login-box" id="loginBox">
+    <h1 style="font-size:18px;">Admin login</h1>
+    <p class="sub" style="margin-bottom:16px;">Enter the admin password to edit campaign data.</p>
+    <input type="password" id="passwordInput" placeholder="Password" onkeydown="if(event.key==='Enter') login()">
+    <button onclick="login()">Log in</button>
+    <div class="error-msg" id="loginError"></div>
+  </div>
+
+  <div id="editor" style="display:none;">
+    <header>
+      <div>
+        <h1>Admin — Edit campaign data</h1>
+        <p class="sub">Changes save immediately and appear on the public dashboard right away.</p>
+      </div>
+      <div class="controls">
+        <a class="toggle-btn" href="/" style="text-decoration:none;">← Back to dashboard</a>
+        <button onclick="logout()">Log out</button>
+      </div>
+    </header>
+
+    <section>
+      <h2>Select month</h2>
+      <p class="desc">Pick an existing month or add a new one.</p>
+      <div class="controls" style="margin-bottom: 6px;">
+        <select id="monthSelect"></select>
+        <input id="newMonthInput" placeholder="YYYY-MM e.g. 2026-09" style="width:160px;">
+        <button onclick="addMonth()">Add month</button>
+        <button class="danger" onclick="removeMonth()">Delete this month</button>
+      </div>
+    </section>
+
+    <section>
+      <h2 id="campaignsTitle">Campaigns for this month</h2>
+      <p class="desc">Edit a field and press Save on that row, or add a new campaign below.</p>
+      <div id="campaignsList"></div>
+      <hr style="border-color:var(--border); margin: 16px 0;">
+      <h2 style="font-size:13px;">Add a new campaign</h2>
+      <form class="admin-form" onsubmit="event.preventDefault(); createCampaign();">
+        <div><label>Date</label><input id="new_date" placeholder="Aug 12"></div>
+        <div style="grid-column: span 2;"><label>Campaign name</label><input id="new_name" placeholder="Summer promo email"></div>
+        <div><label>Status</label>
+          <select id="new_status">
+            <option value="sent" selected>Sent</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="draft">Draft</option>
+          </select>
+        </div>
+        <div><label>Opens</label><input id="new_opens" type="number" value="0"></div>
+        <div><label>Clicks</label><input id="new_clicks" type="number" value="0"></div>
+        <div><label>Unsubscribes</label><input id="new_unsubscribes" type="number" value="0"></div>
+        <div><label>Revenue ($)</label><input id="new_revenue" type="number" step="0.01" value="0"></div>
+        <div style="grid-column: 1 / -1;"><button type="submit">Add campaign</button></div>
+      </form>
+    </section>
+  </div>
+</div>
+
+<script>
+let MONTHS = [];
+let DATA = {};
+let currentMonth = null;
+
+async function checkSession() {
+  const res = await fetch("/api/session");
+  const { loggedIn } = await res.json();
+  if (loggedIn) showEditor();
+}
+
+async function login() {
+  const password = document.getElementById("passwordInput").value;
+  const res = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  });
+  if (res.ok) {
+    showEditor();
+  } else {
+    document.getElementById("loginError").textContent = "Wrong password.";
+  }
+}
+
+async function logout() {
+  await fetch("/api/logout", { method: "POST" });
+  document.getElementById("editor").style.display = "none";
+  document.getElementById("loginBox").style.display = "block";
+}
+
+async function showEditor() {
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("editor").style.display = "block";
+  await loadData();
+}
+
+async function loadData() {
+  const res = await fetch("/api/months");
+  DATA = await res.json();
+  MONTHS = Object.keys(DATA).sort();
+  currentMonth = MONTHS[MONTHS.length - 1] || null;
+  populateMonthSelect();
+  renderCampaigns();
+}
+
+function populateMonthSelect() {
+  const sel = document.getElementById("monthSelect");
+  sel.innerHTML = "";
+  MONTHS.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m;
+    opt.textContent = m;
+    if (m === currentMonth) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.onchange = e => { currentMonth = e.target.value; renderCampaigns(); };
+}
+
+async function addMonth() {
+  const m = document.getElementById("newMonthInput").value.trim();
+  if (!/^\d{4}-\d{2}$/.test(m)) { alert("Use format YYYY-MM, e.g. 2026-09"); return; }
+  await fetch(`/api/months/${m}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ campaigns: [] }),
+  });
+  await loadData();
+  currentMonth = m;
+  document.getElementById("monthSelect").value = m;
+  renderCampaigns();
+}
+
+async function removeMonth() {
+  if (!currentMonth) return;
+  if (!confirm(`Delete all data for ${currentMonth}? This cannot be undone.`)) return;
+  await fetch(`/api/months/${currentMonth}`, { method: "DELETE" });
+  await loadData();
+}
+
+function renderCampaigns() {
+  document.getElementById("campaignsTitle").textContent = `Campaigns for ${currentMonth || "—"}`;
+  const el = document.getElementById("campaignsList");
+  const monthData = DATA[currentMonth];
+  const campaigns = monthData ? monthData.campaigns : [];
+  if (!campaigns.length) {
+    el.innerHTML = `<div class="empty-state">No campaigns yet for this month. Add one below.</div>`;
+    return;
+  }
+  el.innerHTML = campaigns.map((c, i) => `
+    <form class="admin-form" onsubmit="event.preventDefault(); saveCampaign(${i});" data-index="${i}">
+      <div><label>Date</label><input value="${escapeHtml(c.date)}" data-field="date"></div>
+      <div style="grid-column: span 2;"><label>Campaign name</label><input value="${escapeHtml(c.name)}" data-field="name"></div>
+      <div><label>Status</label>
+        <select data-field="status">
+          <option value="sent" ${c.status==='sent'?'selected':''}>Sent</option>
+          <option value="scheduled" ${c.status==='scheduled'?'selected':''}>Scheduled</option>
+          <option value="draft" ${c.status==='draft'?'selected':''}>Draft</option>
+        </select>
+      </div>
+      <div><label>Opens</label><input type="number" value="${c.opens}" data-field="opens"></div>
+      <div><label>Clicks</label><input type="number" value="${c.clicks}" data-field="clicks"></div>
+      <div><label>Unsubscribes</label><input type="number" value="${c.unsubscribes}" data-field="unsubscribes"></div>
+      <div><label>Revenue ($)</label><input type="number" step="0.01" value="${c.revenue}" data-field="revenue"></div>
+      <div class="row-actions" style="align-self:end;">
+        <button type="submit">Save</button>
+        <button type="button" class="danger" onclick="deleteCampaignRow(${i})">Delete</button>
+      </div>
+    </form>
+  `).join("<hr style='border-color:var(--border); margin:10px 0;'>");
+}
+
+function readForm(form) {
+  const c = {};
+  form.querySelectorAll("[data-field]").forEach(input => {
+    c[input.dataset.field] = input.value;
+  });
+  return c;
+}
+
+async function saveCampaign(index) {
+  const form = document.querySelector(`form[data-index="${index}"]`);
+  const c = readForm(form);
+  await fetch(`/api/months/${currentMonth}/campaigns/${index}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(c),
+  });
+  await loadData();
+}
+
+async function deleteCampaignRow(index) {
+  if (!confirm("Delete this campaign?")) return;
+  await fetch(`/api/months/${currentMonth}/campaigns/${index}`, { method: "DELETE" });
+  await loadData();
+}
+
+async function createCampaign() {
+  const c = {
+    date: document.getElementById("new_date").value,
+    name: document.getElementById("new_name").value,
+    status: document.getElementById("new_status").value,
+    opens: document.getElementById("new_opens").value,
+    clicks: document.getElementById("new_clicks").value,
+    unsubscribes: document.getElementById("new_unsubscribes").value,
+    revenue: document.getElementById("new_revenue").value,
+  };
+  if (!c.name) { alert("Campaign name is required."); return; }
+  await fetch(`/api/months/${currentMonth}/campaigns`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(c),
+  });
+  ["new_date","new_name"].forEach(id => document.getElementById(id).value = "");
+  ["new_opens","new_clicks","new_unsubscribes","new_revenue"].forEach(id => document.getElementById(id).value = "0");
+  await loadData();
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+}
+
+checkSession();
+</script>
+</body>
+</html>

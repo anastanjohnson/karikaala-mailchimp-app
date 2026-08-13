@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mailchimp Campaigns Monthly — KARIKAALA</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="viz-root wrap">
+  <header>
+    <div>
+      <h1>Mailchimp Campaigns Monthly — KARIKAALA</h1>
+      <p class="sub">Mailchimp account · Source: Mailchimp campaign reports</p>
+    </div>
+    <div class="controls">
+      <select id="monthSelect" aria-label="Select month"></select>
+      <button class="toggle-btn active" id="chartToggle" onclick="setView('chart')">Chart view</button>
+      <button class="toggle-btn" id="tableToggle" onclick="setView('table')">Table view</button>
+      <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()">Dark mode</button>
+      <a class="toggle-btn" href="/admin" style="text-decoration:none;">Admin</a>
+    </div>
+  </header>
+
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <section>
+    <h2>Monthly trend</h2>
+    <p class="desc">Total opens by month. Click a bar to jump to that month.</p>
+    <div class="month-bars" id="monthBars"></div>
+  </section>
+
+  <section id="campaignSection">
+    <h2 id="campaignSectionTitle">Campaign performance</h2>
+    <p class="desc" id="campaignSectionDesc">Opens delivered by each campaign sent in the selected month.</p>
+    <div id="campaignChart"></div>
+    <div id="campaignTable" style="display:none;"></div>
+  </section>
+
+  <footer>Source: Mailchimp campaign reports. Data is served live from this site's backend — use the <a href="/admin">Admin</a> page to add new months.</footer>
+</div>
+
+<script>
+let DATA = {};
+let MONTHS = [];
+const MONTH_LABELS = {};
+let currentMonth = null;
+let currentView = "chart";
+
+const fmt = n => n.toLocaleString("en-US");
+const usd = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+function labelFor(m) {
+  const [y, mo] = m.split("-");
+  const names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return `${names[parseInt(mo,10)-1]} ${y}`;
+}
+
+async function loadData() {
+  const res = await fetch("/api/months");
+  DATA = await res.json();
+  MONTHS = Object.keys(DATA).sort();
+  MONTHS.forEach(m => MONTH_LABELS[m] = labelFor(m));
+  currentMonth = MONTHS[MONTHS.length - 1] || null;
+  populateMonthSelect();
+  render();
+}
+
+function populateMonthSelect() {
+  const sel = document.getElementById("monthSelect");
+  sel.innerHTML = "";
+  MONTHS.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m;
+    opt.textContent = MONTH_LABELS[m];
+    if (m === currentMonth) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener("change", e => { currentMonth = e.target.value; render(); });
+}
+
+function computeKpis(campaigns) {
+  const opens = campaigns.reduce((s,c)=>s+c.opens,0);
+  const clicks = campaigns.reduce((s,c)=>s+c.clicks,0);
+  const unsubscribes = campaigns.reduce((s,c)=>s+c.unsubscribes,0);
+  const revenue = campaigns.reduce((s,c)=>s+c.revenue,0);
+  const sent = campaigns.filter(c=>c.status==="sent").length;
+  const ctr = opens ? (clicks/opens*100) : 0;
+  return { opens, clicks, unsubscribes, revenue, sent, ctr, count: campaigns.length };
+}
+
+function prevMonthKey(m) {
+  const idx = MONTHS.indexOf(m);
+  return idx > 0 ? MONTHS[idx-1] : null;
+}
+
+function deltaHtml(curr, prev, label) {
+  if (!prev) return "";
+  const pct = ((curr - prev) / prev) * 100;
+  const cls = pct >= 0 ? "up" : "down";
+  const sign = pct >= 0 ? "+" : "";
+  return `<div class="delta ${cls}">${sign}${pct.toFixed(0)}% vs ${label}</div>`;
+}
+
+function renderKpis(campaigns, month) {
+  const row = document.getElementById("kpiRow");
+  if (!campaigns.length) { row.innerHTML = ""; return; }
+  const k = computeKpis(campaigns);
+  const pm = prevMonthKey(month);
+  const pk = pm && DATA[pm] ? computeKpis(DATA[pm].campaigns) : null;
+  const pLabel = pm ? MONTH_LABELS[pm] : "";
+  const tiles = [
+    ["Total opens", fmt(k.opens), pk ? deltaHtml(k.opens, pk.opens, pLabel) : ""],
+    ["Total clicks", fmt(k.clicks), pk ? deltaHtml(k.clicks, pk.clicks, pLabel) : ""],
+    ["Unsubscribes", fmt(k.unsubscribes), pk ? deltaHtml(k.unsubscribes, pk.unsubscribes, pLabel) : ""],
+    ["Revenue", usd(k.revenue), pk ? deltaHtml(k.revenue, pk.revenue, pLabel) : ""],
+    ["Click-to-open rate", k.ctr.toFixed(1) + "%", ""],
+    ["Campaigns this month", String(k.count), `<div class="delta">${k.sent} sent</div>`]
+  ];
+  row.innerHTML = tiles.map(([label,value,delta]) => `
+    <div class="kpi">
+      <div class="label">${label}</div>
+      <div class="value">${value}</div>
+      ${delta}
+    </div>`).join("");
+}
+
+function renderCampaignChart(campaigns) {
+  const el = document.getElementById("campaignChart");
+  if (!campaigns.length) { el.innerHTML = `<div class="empty-state">No campaigns recorded for this month.</div>`; return; }
+  const max = Math.max(...campaigns.map(c=>c.opens));
+  const sorted = [...campaigns].sort((a,b)=>b.opens-a.opens);
+  el.innerHTML = sorted.map((c) => {
+    const pct = max ? (c.opens/max*100) : 0;
+    return `
+    <div class="bar-row">
+      <div class="bar-label" title="${c.name}">${c.date} · ${c.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%" data-tip="Opens: ${fmt(c.opens)} · Clicks: ${fmt(c.clicks)} · Unsubs: ${fmt(c.unsubscribes)}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
+      </div>
+      <div class="bar-value">${fmt(c.opens)}</div>
+    </div>`;
+  }).join("");
+}
+
+function renderCampaignTable(campaigns) {
+  const el = document.getElementById("campaignTable");
+  if (!campaigns.length) { el.innerHTML = `<div class="empty-state">No campaigns recorded for this month.</div>`; return; }
+  const rows = [...campaigns].sort((a,b)=>b.opens-a.opens).map(c => `
+    <tr>
+      <td>${c.date}</td>
+      <td>${c.name}</td>
+      <td><span class="status-pill ${c.status}">${c.status.charAt(0).toUpperCase()+c.status.slice(1)}</span></td>
+      <td class="num">${fmt(c.opens)}</td>
+      <td class="num">${fmt(c.clicks)}</td>
+      <td class="num">${fmt(c.unsubscribes)}</td>
+      <td class="num">${usd(c.revenue)}</td>
+    </tr>`).join("");
+  el.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Date</th><th>Campaign</th><th>Status</th>
+        <th class="num">Opens</th><th class="num">Clicks</th><th class="num">Unsubs</th><th class="num">Revenue</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function renderMonthBars() {
+  const el = document.getElementById("monthBars");
+  const opensArr = MONTHS.map(m => DATA[m] ? computeKpis(DATA[m].campaigns).opens : 0);
+  const max = Math.max(...opensArr, 1);
+  el.innerHTML = MONTHS.map((m,i) => {
+    const has = !!DATA[m];
+    const h = has ? Math.max((opensArr[i]/max*100), 3) : 4;
+    const isSel = m === currentMonth;
+    return `
+    <div class="month-col">
+      <div class="month-val">${has ? fmt(opensArr[i]) : ""}</div>
+      <div class="month-bar-wrap">
+        <div class="month-bar ${isSel ? 'selected' : ''}" style="height:${h}%" data-tip="${MONTH_LABELS[m]}: ${fmt(opensArr[i])} opens" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)" onclick="selectMonth('${m}')"></div>
+      </div>
+      <div class="month-lbl">${MONTH_LABELS[m]}</div>
+    </div>`;
+  }).join("");
+}
+
+function selectMonth(m) {
+  currentMonth = m;
+  document.getElementById("monthSelect").value = m;
+  render();
+}
+
+let sharedTip = null;
+function showTip(evt, el) {
+  if (!sharedTip) {
+    sharedTip = document.createElement("div");
+    sharedTip.className = "tooltip";
+    document.body.appendChild(sharedTip);
+  }
+  sharedTip.textContent = el.getAttribute("data-tip");
+  sharedTip.style.opacity = "1";
+  sharedTip.style.left = evt.clientX + "px";
+  sharedTip.style.top = evt.clientY + "px";
+}
+function hideTip() { if (sharedTip) sharedTip.style.opacity = "0"; }
+
+function setView(view) {
+  currentView = view;
+  document.getElementById("chartToggle").classList.toggle("active", view === "chart");
+  document.getElementById("tableToggle").classList.toggle("active", view === "table");
+  document.getElementById("campaignChart").style.display = view === "chart" ? "" : "none";
+  document.getElementById("campaignTable").style.display = view === "table" ? "" : "none";
+}
+
+function toggleTheme() {
+  const root = document.documentElement;
+  const isDark = root.getAttribute("data-theme") === "dark";
+  root.setAttribute("data-theme", isDark ? "light" : "dark");
+  document.getElementById("themeToggle").textContent = isDark ? "Dark mode" : "Light mode";
+}
+
+function render() {
+  if (!currentMonth) {
+    document.getElementById("kpiRow").innerHTML = "";
+    document.getElementById("campaignChart").innerHTML = `<div class="empty-state">No data yet. Add a month in the Admin page.</div>`;
+    document.getElementById("monthBars").innerHTML = "";
+    return;
+  }
+  const monthData = DATA[currentMonth];
+  const campaigns = monthData ? monthData.campaigns : [];
+  const label = MONTH_LABELS[currentMonth];
+  document.getElementById("campaignSectionTitle").textContent = `Campaign performance — ${label}`;
+  renderKpis(campaigns, currentMonth);
+  renderCampaignChart(campaigns);
+  renderCampaignTable(campaigns);
+  renderMonthBars();
+  setView(currentView);
+}
+
+loadData();
+</script>
+</body>
+</html>
