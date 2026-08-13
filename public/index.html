@@ -123,7 +123,7 @@ let DATA = { mailchimp: {}, meta: {} };
 let GUESTS = {};
 let MONTHS = { mailchimp: [], meta: [] };
 const MONTH_LABELS = {};
-let channel = "compare";
+let channel = "mailchimp";
 let currentMonth = { mailchimp: null, meta: null };
 let currentView = "chart";
 
@@ -154,6 +154,7 @@ async function loadData() {
   populateMonthSelect();
   render();
   renderCompare();
+  setChannel("compare");
 }
 
 function populateMonthSelect() {
