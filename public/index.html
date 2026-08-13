@@ -134,17 +134,16 @@ let channel = "mailchimp";
 let currentMonth = { mailchimp: null, meta: null };
 let currentView = "chart";
 
-// Additional marketing vendors not tied to Mailchimp/Meta — flat totals for a fixed
-// Jan–Jul 2026 period, spread evenly across those months so they can be filtered by range.
+// Additional marketing vendors not tied to Mailchimp/Meta — flat spend charged every
+// month within a fixed Jan–Jul 2026 period.
 const EXTRA_VENDOR_MONTHS = ["2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07"];
 const EXTRA_VENDORS = [
-  { key: "kyte", label: "Kyte", total: 691 },
-  { key: "triston", label: "Triston", total: 1600 },
+  { key: "kyte", label: "Kyte", perMonth: 691 },
+  { key: "triston", label: "Triston", perMonth: 1600 },
 ];
 function extraVendorSpendForMonths(vendor, months) {
-  const perMonth = vendor.total / EXTRA_VENDOR_MONTHS.length;
   const count = months.filter(m => EXTRA_VENDOR_MONTHS.includes(m)).length;
-  return perMonth * count;
+  return vendor.perMonth * count;
 }
 
 const fmt = n => Number(n||0).toLocaleString("en-US");
@@ -564,7 +563,7 @@ function renderCompare() {
   document.getElementById("compareKpiRowSpend").innerHTML = kpiHtml([
     ["Total marketing spend", eur(totalSpend)],
     ["Meta Ads — spend", eur(metaTotals.spend)],
-    ["Mailchimp — spend (invoices)", usd(mcTotals.invoice)],
+    ["Mailchimp — spend", usd(mcTotals.invoice)],
     ...extraTotals.map(v => [`${v.label} — spend`, eur(v.spend)]),
   ]);
   document.getElementById("compareKpiRowReach").innerHTML = kpiHtml([
