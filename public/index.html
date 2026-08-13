@@ -3,52 +3,91 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mailchimp Campaigns Monthly — KARIKAALA</title>
+<title>Marketing Dashboard — KARIKAALA</title>
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <div class="viz-root wrap">
   <header>
     <div>
-      <h1>Mailchimp Campaigns Monthly — KARIKAALA</h1>
-      <p class="sub">Mailchimp account · Source: Mailchimp campaign reports</p>
+      <h1>Marketing Dashboard — KARIKAALA</h1>
+      <p class="sub">Meta Ads + Mailchimp, one place for all channels · Source: live backend</p>
     </div>
     <div class="controls">
-      <select id="monthSelect" aria-label="Select month"></select>
-      <button class="toggle-btn active" id="chartToggle" onclick="setView('chart')">Chart view</button>
-      <button class="toggle-btn" id="tableToggle" onclick="setView('table')">Table view</button>
       <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()">Dark mode</button>
       <a class="toggle-btn" href="/admin" style="text-decoration:none;">Admin</a>
     </div>
   </header>
 
-  <div class="kpi-row" id="kpiRow"></div>
+  <div class="channel-tabs">
+    <button class="toggle-btn active" id="tabMailchimp" onclick="setChannel('mailchimp')">Mailchimp</button>
+    <button class="toggle-btn" id="tabMeta" onclick="setChannel('meta')">Meta Ads</button>
+    <button class="toggle-btn" id="tabCompare" onclick="setChannel('compare')">Compare channels</button>
+  </div>
 
-  <section>
-    <h2>Monthly trend</h2>
-    <p class="desc">Total opens by month. Click a bar to jump to that month.</p>
-    <div class="month-bars" id="monthBars"></div>
-  </section>
+  <!-- Single-channel view -->
+  <div id="singleView">
+    <div class="controls" style="margin: 10px 0 18px;">
+      <select id="monthSelect" aria-label="Select month"></select>
+      <button class="toggle-btn active" id="chartToggle" onclick="setView('chart')">Chart view</button>
+      <button class="toggle-btn" id="tableToggle" onclick="setView('table')">Table view</button>
+    </div>
 
-  <section id="campaignSection">
-    <h2 id="campaignSectionTitle">Campaign performance</h2>
-    <p class="desc" id="campaignSectionDesc">Opens delivered by each campaign sent in the selected month.</p>
-    <div id="campaignChart"></div>
-    <div id="campaignTable" style="display:none;"></div>
-  </section>
+    <div class="kpi-row" id="kpiRow"></div>
 
-  <footer>Source: Mailchimp campaign reports. Data is served live from this site's backend — use the <a href="/admin">Admin</a> page to add new months.</footer>
+    <section>
+      <h2 id="trendTitle">Monthly trend</h2>
+      <p class="desc" id="trendDesc">Total performance by month. Click a bar to jump to that month.</p>
+      <div class="month-bars" id="monthBars"></div>
+    </section>
+
+    <section id="itemSection">
+      <h2 id="itemSectionTitle">Performance</h2>
+      <p class="desc" id="itemSectionDesc"></p>
+      <div id="itemChart"></div>
+      <div id="itemTable" style="display:none;"></div>
+    </section>
+  </div>
+
+  <!-- Combined comparison view -->
+  <div id="compareView" style="display:none;">
+    <div class="kpi-row" id="compareKpiRow" style="grid-template-columns: repeat(4,1fr);"></div>
+
+    <section>
+      <h2>Reach vs. engagement, by month — both channels</h2>
+      <p class="desc">Meta Ads reach (people reached) vs. Mailchimp opens, per month. Bars are scaled independently per channel so both are visible.</p>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot ch-mailchimp"></span> Mailchimp opens</span>
+        <span class="legend-item"><span class="legend-dot ch-meta"></span> Meta Ads reach (viewers)</span>
+      </div>
+      <div class="month-bars" id="compareBars" style="height:180px;"></div>
+    </section>
+
+    <section>
+      <h2>Monthly summary — side by side</h2>
+      <p class="desc">Spend is Meta Ads only (Mailchimp is a flat subscription fee, not billed per campaign).</p>
+      <div id="compareTable"></div>
+    </section>
+  </div>
+
+  <footer>Source: Meta Ads Manager + Mailchimp campaign reports. Data is served live from this site's backend — use the <a href="/admin">Admin</a> page to add new months.</footer>
 </div>
 
 <script>
-let DATA = {};
-let MONTHS = [];
+const CHANNEL_META = {
+  mailchimp: { itemKey: "campaigns", label: "Mailchimp", metric: "opens", metricLabel: "Opens" },
+  meta: { itemKey: "ads", label: "Meta Ads", metric: "viewers", metricLabel: "Reach" },
+};
+let DATA = { mailchimp: {}, meta: {} };
+let MONTHS = { mailchimp: [], meta: [] };
 const MONTH_LABELS = {};
-let currentMonth = null;
+let channel = "mailchimp";
+let currentMonth = { mailchimp: null, meta: null };
 let currentView = "chart";
 
-const fmt = n => n.toLocaleString("en-US");
-const usd = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmt = n => Number(n||0).toLocaleString("en-US");
+const usd = n => "$" + Number(n||0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const eur = n => "€" + Number(n||0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 function labelFor(m) {
   const [y, mo] = m.split("-");
@@ -57,66 +96,104 @@ function labelFor(m) {
 }
 
 async function loadData() {
-  const res = await fetch("/api/months");
-  DATA = await res.json();
-  MONTHS = Object.keys(DATA).sort();
-  MONTHS.forEach(m => MONTH_LABELS[m] = labelFor(m));
-  currentMonth = MONTHS[MONTHS.length - 1] || null;
+  const [mc, meta] = await Promise.all([
+    fetch("/api/mailchimp/months").then(r=>r.json()),
+    fetch("/api/meta/months").then(r=>r.json()),
+  ]);
+  DATA.mailchimp = mc;
+  DATA.meta = meta;
+  MONTHS.mailchimp = Object.keys(mc).sort();
+  MONTHS.meta = Object.keys(meta).sort();
+  [...MONTHS.mailchimp, ...MONTHS.meta].forEach(m => MONTH_LABELS[m] = labelFor(m));
+  currentMonth.mailchimp = MONTHS.mailchimp[MONTHS.mailchimp.length-1] || null;
+  currentMonth.meta = MONTHS.meta[MONTHS.meta.length-1] || null;
   populateMonthSelect();
   render();
+  renderCompare();
 }
 
 function populateMonthSelect() {
   const sel = document.getElementById("monthSelect");
   sel.innerHTML = "";
-  MONTHS.forEach(m => {
+  MONTHS[channel].forEach(m => {
     const opt = document.createElement("option");
     opt.value = m;
     opt.textContent = MONTH_LABELS[m];
-    if (m === currentMonth) opt.selected = true;
+    if (m === currentMonth[channel]) opt.selected = true;
     sel.appendChild(opt);
   });
-  sel.addEventListener("change", e => { currentMonth = e.target.value; render(); });
+  sel.onchange = e => { currentMonth[channel] = e.target.value; render(); };
 }
 
-function computeKpis(campaigns) {
-  const opens = campaigns.reduce((s,c)=>s+c.opens,0);
-  const clicks = campaigns.reduce((s,c)=>s+c.clicks,0);
-  const unsubscribes = campaigns.reduce((s,c)=>s+c.unsubscribes,0);
-  const revenue = campaigns.reduce((s,c)=>s+c.revenue,0);
-  const sent = campaigns.filter(c=>c.status==="sent").length;
+function itemsFor(ch, month) {
+  const key = CHANNEL_META[ch].itemKey;
+  const monthData = DATA[ch][month];
+  return monthData ? (monthData[key] || []) : [];
+}
+
+function computeKpisMailchimp(items) {
+  const opens = items.reduce((s,c)=>s+c.opens,0);
+  const clicks = items.reduce((s,c)=>s+c.clicks,0);
+  const unsubscribes = items.reduce((s,c)=>s+c.unsubscribes,0);
+  const revenue = items.reduce((s,c)=>s+c.revenue,0);
+  const sent = items.filter(c=>c.status==="sent").length;
   const ctr = opens ? (clicks/opens*100) : 0;
-  return { opens, clicks, unsubscribes, revenue, sent, ctr, count: campaigns.length };
+  return { opens, clicks, unsubscribes, revenue, sent, ctr, count: items.length };
 }
 
-function prevMonthKey(m) {
-  const idx = MONTHS.indexOf(m);
-  return idx > 0 ? MONTHS[idx-1] : null;
+function computeKpisMeta(items) {
+  const spend = items.reduce((s,a)=>s+a.spend,0);
+  const views = items.reduce((s,a)=>s+a.views,0);
+  const viewers = items.reduce((s,a)=>s+a.viewers,0);
+  const results = items.reduce((s,a)=>s+a.results,0);
+  const active = items.filter(a=>a.status==="active").length;
+  const costPerResult = results ? (spend/results) : 0;
+  return { spend, views, viewers, results, active, costPerResult, count: items.length };
 }
 
-function deltaHtml(curr, prev, label) {
+function prevMonthKey(ch, m) {
+  const idx = MONTHS[ch].indexOf(m);
+  return idx > 0 ? MONTHS[ch][idx-1] : null;
+}
+
+function deltaHtml(curr, prev, label, invert) {
   if (!prev) return "";
   const pct = ((curr - prev) / prev) * 100;
-  const cls = pct >= 0 ? "up" : "down";
+  const good = invert ? pct <= 0 : pct >= 0;
+  const cls = good ? "up" : "down";
   const sign = pct >= 0 ? "+" : "";
   return `<div class="delta ${cls}">${sign}${pct.toFixed(0)}% vs ${label}</div>`;
 }
 
-function renderKpis(campaigns, month) {
+function renderKpis(items, month) {
   const row = document.getElementById("kpiRow");
-  if (!campaigns.length) { row.innerHTML = ""; return; }
-  const k = computeKpis(campaigns);
-  const pm = prevMonthKey(month);
-  const pk = pm && DATA[pm] ? computeKpis(DATA[pm].campaigns) : null;
+  if (!items.length) { row.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">No data for this month.</div>`; return; }
+  const pm = prevMonthKey(channel, month);
   const pLabel = pm ? MONTH_LABELS[pm] : "";
-  const tiles = [
-    ["Total opens", fmt(k.opens), pk ? deltaHtml(k.opens, pk.opens, pLabel) : ""],
-    ["Total clicks", fmt(k.clicks), pk ? deltaHtml(k.clicks, pk.clicks, pLabel) : ""],
-    ["Unsubscribes", fmt(k.unsubscribes), pk ? deltaHtml(k.unsubscribes, pk.unsubscribes, pLabel) : ""],
-    ["Revenue", usd(k.revenue), pk ? deltaHtml(k.revenue, pk.revenue, pLabel) : ""],
-    ["Click-to-open rate", k.ctr.toFixed(1) + "%", ""],
-    ["Campaigns this month", String(k.count), `<div class="delta">${k.sent} sent</div>`]
-  ];
+  let tiles;
+  if (channel === "mailchimp") {
+    const k = computeKpisMailchimp(items);
+    const pk = pm && DATA.mailchimp[pm] ? computeKpisMailchimp(itemsFor("mailchimp", pm)) : null;
+    tiles = [
+      ["Total opens", fmt(k.opens), pk ? deltaHtml(k.opens, pk.opens, pLabel) : ""],
+      ["Total clicks", fmt(k.clicks), pk ? deltaHtml(k.clicks, pk.clicks, pLabel) : ""],
+      ["Unsubscribes", fmt(k.unsubscribes), pk ? deltaHtml(k.unsubscribes, pk.unsubscribes, pLabel, true) : ""],
+      ["Revenue", usd(k.revenue), pk ? deltaHtml(k.revenue, pk.revenue, pLabel) : ""],
+      ["Click-to-open rate", k.ctr.toFixed(1) + "%", ""],
+      ["Campaigns this month", String(k.count), `<div class="delta">${k.sent} sent</div>`]
+    ];
+  } else {
+    const k = computeKpisMeta(items);
+    const pk = pm && DATA.meta[pm] ? computeKpisMeta(itemsFor("meta", pm)) : null;
+    tiles = [
+      ["Amount spent", eur(k.spend), pk ? deltaHtml(k.spend, pk.spend, pLabel, true) : ""],
+      ["Total reach", fmt(k.viewers), pk ? deltaHtml(k.viewers, pk.viewers, pLabel) : ""],
+      ["Impressions", fmt(k.views), pk ? deltaHtml(k.views, pk.views, pLabel) : ""],
+      ["Results", fmt(k.results), pk ? deltaHtml(k.results, pk.results, pLabel) : ""],
+      ["Avg. cost / result", eur(k.costPerResult), ""],
+      ["Ads this month", String(k.count), `<div class="delta">${k.active} active</div>`]
+    ];
+  }
   row.innerHTML = tiles.map(([label,value,delta]) => `
     <div class="kpi">
       <div class="label">${label}</div>
@@ -125,60 +202,77 @@ function renderKpis(campaigns, month) {
     </div>`).join("");
 }
 
-function renderCampaignChart(campaigns) {
-  const el = document.getElementById("campaignChart");
-  if (!campaigns.length) { el.innerHTML = `<div class="empty-state">No campaigns recorded for this month.</div>`; return; }
-  const max = Math.max(...campaigns.map(c=>c.opens));
-  const sorted = [...campaigns].sort((a,b)=>b.opens-a.opens);
+function renderItemChart(items) {
+  const el = document.getElementById("itemChart");
+  if (!items.length) { el.innerHTML = `<div class="empty-state">No data recorded for this month.</div>`; return; }
+  const metric = channel === "mailchimp" ? "opens" : "viewers";
+  const max = Math.max(...items.map(c=>c[metric]));
+  const sorted = [...items].sort((a,b)=>b[metric]-a[metric]);
+  const clsExtra = channel === "meta" ? "ch-meta" : "";
   el.innerHTML = sorted.map((c) => {
-    const pct = max ? (c.opens/max*100) : 0;
+    const pct = max ? (c[metric]/max*100) : 0;
+    const tip = channel === "mailchimp"
+      ? `Opens: ${fmt(c.opens)} · Clicks: ${fmt(c.clicks)} · Unsubs: ${fmt(c.unsubscribes)}`
+      : `Reach: ${fmt(c.viewers)} · Impressions: ${fmt(c.views)} · Spend: ${eur(c.spend)} · ${c.resultType||""}: ${fmt(c.results)}`;
     return `
     <div class="bar-row">
       <div class="bar-label" title="${c.name}">${c.date} · ${c.name}</div>
       <div class="bar-track">
-        <div class="bar-fill" style="width:${pct}%" data-tip="Opens: ${fmt(c.opens)} · Clicks: ${fmt(c.clicks)} · Unsubs: ${fmt(c.unsubscribes)}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
+        <div class="bar-fill ${clsExtra}" style="width:${pct}%" data-tip="${tip}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
       </div>
-      <div class="bar-value">${fmt(c.opens)}</div>
+      <div class="bar-value">${fmt(c[metric])}</div>
     </div>`;
   }).join("");
 }
 
-function renderCampaignTable(campaigns) {
-  const el = document.getElementById("campaignTable");
-  if (!campaigns.length) { el.innerHTML = `<div class="empty-state">No campaigns recorded for this month.</div>`; return; }
-  const rows = [...campaigns].sort((a,b)=>b.opens-a.opens).map(c => `
-    <tr>
-      <td>${c.date}</td>
-      <td>${c.name}</td>
-      <td><span class="status-pill ${c.status}">${c.status.charAt(0).toUpperCase()+c.status.slice(1)}</span></td>
-      <td class="num">${fmt(c.opens)}</td>
-      <td class="num">${fmt(c.clicks)}</td>
-      <td class="num">${fmt(c.unsubscribes)}</td>
-      <td class="num">${usd(c.revenue)}</td>
-    </tr>`).join("");
-  el.innerHTML = `
-    <table>
-      <thead><tr>
-        <th>Date</th><th>Campaign</th><th>Status</th>
-        <th class="num">Opens</th><th class="num">Clicks</th><th class="num">Unsubs</th><th class="num">Revenue</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+function renderItemTable(items) {
+  const el = document.getElementById("itemTable");
+  if (!items.length) { el.innerHTML = `<div class="empty-state">No data recorded for this month.</div>`; return; }
+  if (channel === "mailchimp") {
+    const rows = [...items].sort((a,b)=>b.opens-a.opens).map(c => `
+      <tr>
+        <td>${c.date}</td><td>${c.name}</td>
+        <td><span class="status-pill ${c.status}">${c.status.charAt(0).toUpperCase()+c.status.slice(1)}</span></td>
+        <td class="num">${fmt(c.opens)}</td><td class="num">${fmt(c.clicks)}</td>
+        <td class="num">${fmt(c.unsubscribes)}</td><td class="num">${usd(c.revenue)}</td>
+      </tr>`).join("");
+    el.innerHTML = `<table><thead><tr>
+      <th>Date</th><th>Campaign</th><th>Status</th>
+      <th class="num">Opens</th><th class="num">Clicks</th><th class="num">Unsubs</th><th class="num">Revenue</th>
+    </tr></thead><tbody>${rows}</tbody></table>`;
+  } else {
+    const rows = [...items].sort((a,b)=>b.viewers-a.viewers).map(a => `
+      <tr>
+        <td>${a.date}</td><td>${a.name}</td>
+        <td><span class="status-pill ${a.status}">${a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span></td>
+        <td class="num">${fmt(a.viewers)}</td><td class="num">${fmt(a.views)}</td>
+        <td class="num">${fmt(a.results)}</td><td class="num">${eur(a.spend)}</td>
+      </tr>`).join("");
+    el.innerHTML = `<table><thead><tr>
+      <th>Date</th><th>Ad</th><th>Status</th>
+      <th class="num">Reach</th><th class="num">Impressions</th><th class="num">Results</th><th class="num">Spend</th>
+    </tr></thead><tbody>${rows}</tbody></table>`;
+  }
 }
 
 function renderMonthBars() {
   const el = document.getElementById("monthBars");
-  const opensArr = MONTHS.map(m => DATA[m] ? computeKpis(DATA[m].campaigns).opens : 0);
-  const max = Math.max(...opensArr, 1);
-  el.innerHTML = MONTHS.map((m,i) => {
-    const has = !!DATA[m];
-    const h = has ? Math.max((opensArr[i]/max*100), 3) : 4;
-    const isSel = m === currentMonth;
+  const metric = channel === "mailchimp" ? "opens" : "viewers";
+  const months = MONTHS[channel];
+  const vals = months.map(m => {
+    const items = itemsFor(channel, m);
+    return items.reduce((s,x)=>s+x[metric],0);
+  });
+  const max = Math.max(...vals, 1);
+  const clsExtra = channel === "meta" ? "ch-meta" : "";
+  el.innerHTML = months.map((m,i) => {
+    const h = Math.max((vals[i]/max*100), 3);
+    const isSel = m === currentMonth[channel];
     return `
     <div class="month-col">
-      <div class="month-val">${has ? fmt(opensArr[i]) : ""}</div>
+      <div class="month-val">${fmt(vals[i])}</div>
       <div class="month-bar-wrap">
-        <div class="month-bar ${isSel ? 'selected' : ''}" style="height:${h}%" data-tip="${MONTH_LABELS[m]}: ${fmt(opensArr[i])} opens" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)" onclick="selectMonth('${m}')"></div>
+        <div class="month-bar ${clsExtra} ${isSel ? 'selected' : ''}" style="height:${h}%" data-tip="${MONTH_LABELS[m]}: ${fmt(vals[i])}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)" onclick="selectMonth('${m}')"></div>
       </div>
       <div class="month-lbl">${MONTH_LABELS[m]}</div>
     </div>`;
@@ -186,7 +280,7 @@ function renderMonthBars() {
 }
 
 function selectMonth(m) {
-  currentMonth = m;
+  currentMonth[channel] = m;
   document.getElementById("monthSelect").value = m;
   render();
 }
@@ -209,8 +303,22 @@ function setView(view) {
   currentView = view;
   document.getElementById("chartToggle").classList.toggle("active", view === "chart");
   document.getElementById("tableToggle").classList.toggle("active", view === "table");
-  document.getElementById("campaignChart").style.display = view === "chart" ? "" : "none";
-  document.getElementById("campaignTable").style.display = view === "table" ? "" : "none";
+  document.getElementById("itemChart").style.display = view === "chart" ? "" : "none";
+  document.getElementById("itemTable").style.display = view === "table" ? "" : "none";
+}
+
+function setChannel(ch) {
+  channel = ch;
+  document.getElementById("tabMailchimp").classList.toggle("active", ch === "mailchimp");
+  document.getElementById("tabMeta").classList.toggle("active", ch === "meta");
+  document.getElementById("tabMeta").classList.toggle("ch-meta", ch === "meta");
+  document.getElementById("tabCompare").classList.toggle("active", ch === "compare");
+  document.getElementById("singleView").style.display = ch === "compare" ? "none" : "";
+  document.getElementById("compareView").style.display = ch === "compare" ? "" : "none";
+  if (ch !== "compare") {
+    populateMonthSelect();
+    render();
+  }
 }
 
 function toggleTheme() {
@@ -221,21 +329,98 @@ function toggleTheme() {
 }
 
 function render() {
-  if (!currentMonth) {
+  const month = currentMonth[channel];
+  const cm = CHANNEL_META[channel];
+  document.getElementById("trendTitle").textContent = `Monthly trend — ${cm.label}`;
+  document.getElementById("trendDesc").textContent = `Total ${cm.metricLabel.toLowerCase()} by month. Click a bar to jump to that month.`;
+  if (!month) {
     document.getElementById("kpiRow").innerHTML = "";
-    document.getElementById("campaignChart").innerHTML = `<div class="empty-state">No data yet. Add a month in the Admin page.</div>`;
+    document.getElementById("itemChart").innerHTML = `<div class="empty-state">No data yet. Add a month in the Admin page.</div>`;
     document.getElementById("monthBars").innerHTML = "";
     return;
   }
-  const monthData = DATA[currentMonth];
-  const campaigns = monthData ? monthData.campaigns : [];
-  const label = MONTH_LABELS[currentMonth];
-  document.getElementById("campaignSectionTitle").textContent = `Campaign performance — ${label}`;
-  renderKpis(campaigns, currentMonth);
-  renderCampaignChart(campaigns);
-  renderCampaignTable(campaigns);
+  const items = itemsFor(channel, month);
+  const label = MONTH_LABELS[month];
+  document.getElementById("itemSectionTitle").textContent = `${cm.label} performance — ${label}`;
+  document.getElementById("itemSectionDesc").textContent = channel === "mailchimp"
+    ? "Opens delivered by each campaign sent in the selected month."
+    : "Reach delivered by each ad that ran in the selected month.";
+  renderKpis(items, month);
+  renderItemChart(items);
+  renderItemTable(items);
   renderMonthBars();
   setView(currentView);
+}
+
+function allMonthsUnion() {
+  return Array.from(new Set([...MONTHS.mailchimp, ...MONTHS.meta])).sort();
+}
+
+function renderCompare() {
+  const months = allMonthsUnion();
+  if (!months.length) return;
+
+  // KPI row: totals across all months, both channels
+  const mcTotals = MONTHS.mailchimp.reduce((acc,m)=>{
+    const k = computeKpisMailchimp(itemsFor("mailchimp", m));
+    acc.opens += k.opens; acc.clicks += k.clicks; acc.revenue += k.revenue;
+    return acc;
+  }, {opens:0, clicks:0, revenue:0});
+  const metaTotals = MONTHS.meta.reduce((acc,m)=>{
+    const k = computeKpisMeta(itemsFor("meta", m));
+    acc.spend += k.spend; acc.viewers += k.viewers; acc.results += k.results;
+    return acc;
+  }, {spend:0, viewers:0, results:0});
+
+  document.getElementById("compareKpiRow").innerHTML = [
+    ["Meta Ads — total spend", eur(metaTotals.spend)],
+    ["Meta Ads — total reach", fmt(metaTotals.viewers)],
+    ["Mailchimp — total opens", fmt(mcTotals.opens)],
+    ["Mailchimp — total clicks", fmt(mcTotals.clicks)],
+  ].map(([label,value]) => `
+    <div class="kpi"><div class="label">${label}</div><div class="value">${value}</div></div>
+  `).join("");
+
+  // dual bar chart, independently scaled
+  const mcVals = months.map(m => computeKpisMailchimp(itemsFor("mailchimp", m)).opens);
+  const metaVals = months.map(m => computeKpisMeta(itemsFor("meta", m)).viewers);
+  const mcMax = Math.max(...mcVals, 1);
+  const metaMax = Math.max(...metaVals, 1);
+  const el = document.getElementById("compareBars");
+  el.innerHTML = months.map((m,i) => {
+    const mcH = Math.max((mcVals[i]/mcMax*100), 2);
+    const metaH = Math.max((metaVals[i]/metaMax*100), 2);
+    return `
+    <div class="month-col">
+      <div class="month-val">${fmt(mcVals[i])} / ${fmt(metaVals[i])}</div>
+      <div class="month-bar-wrap">
+        <div class="month-bar" style="height:${mcH}%; flex:1;" data-tip="${MONTH_LABELS[m]} · Mailchimp opens: ${fmt(mcVals[i])}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
+        <div class="month-bar ch-meta" style="height:${metaH}%; flex:1;" data-tip="${MONTH_LABELS[m]} · Meta reach: ${fmt(metaVals[i])}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
+      </div>
+      <div class="month-lbl">${MONTH_LABELS[m]}</div>
+    </div>`;
+  }).join("");
+
+  // side-by-side table
+  const rows = months.map(m => {
+    const mck = computeKpisMailchimp(itemsFor("mailchimp", m));
+    const metak = computeKpisMeta(itemsFor("meta", m));
+    return `
+    <tr>
+      <td>${MONTH_LABELS[m]}</td>
+      <td class="num">${fmt(mck.opens)}</td>
+      <td class="num">${fmt(mck.clicks)}</td>
+      <td class="num">${fmt(metak.viewers)}</td>
+      <td class="num">${fmt(metak.results)}</td>
+      <td class="num">${eur(metak.spend)}</td>
+    </tr>`;
+  }).join("");
+  document.getElementById("compareTable").innerHTML = `
+    <table><thead><tr>
+      <th>Month</th>
+      <th class="num">Mailchimp opens</th><th class="num">Mailchimp clicks</th>
+      <th class="num">Meta reach</th><th class="num">Meta results</th><th class="num">Meta spend</th>
+    </tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 loadData();
