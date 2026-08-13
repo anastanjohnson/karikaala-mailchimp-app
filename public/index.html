@@ -65,7 +65,7 @@
 
     <div class="kpi-group kpi-group-spend">
       <div class="kpi-group-heading"><span class="kpi-group-dot"></span>Spending</div>
-      <div class="kpi-row" id="compareKpiRowSpend" style="grid-template-columns: repeat(3,1fr);"></div>
+      <div class="kpi-row" id="compareKpiRowSpend" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));"></div>
     </div>
 
     <div class="kpi-group kpi-group-response">
@@ -127,6 +127,19 @@ const MONTH_LABELS = {};
 let channel = "mailchimp";
 let currentMonth = { mailchimp: null, meta: null };
 let currentView = "chart";
+
+// Additional marketing vendors not tied to Mailchimp/Meta — flat totals for a fixed
+// Jan–Jul 2026 period, spread evenly across those months so they can be filtered by range.
+const EXTRA_VENDOR_MONTHS = ["2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07"];
+const EXTRA_VENDORS = [
+  { key: "kyte", label: "Kyte", total: 691 },
+  { key: "triston", label: "Triston", total: 1600 },
+];
+function extraVendorSpendForMonths(vendor, months) {
+  const perMonth = vendor.total / EXTRA_VENDOR_MONTHS.length;
+  const count = months.filter(m => EXTRA_VENDOR_MONTHS.includes(m)).length;
+  return perMonth * count;
+}
 
 const fmt = n => Number(n||0).toLocaleString("en-US");
 const usd = n => "$" + Number(n||0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -533,7 +546,9 @@ function renderCompare() {
     acc.spend += k.spend; acc.viewers += k.viewers; acc.results += k.results;
     return acc;
   }, {spend:0, viewers:0, results:0});
-  const totalSpend = metaTotals.spend + mcTotals.invoice;
+  const extraTotals = EXTRA_VENDORS.map(v => ({ ...v, spend: extraVendorSpendForMonths(v, months) }));
+  const extraSpendSum = extraTotals.reduce((s,v)=>s+v.spend, 0);
+  const totalSpend = metaTotals.spend + mcTotals.invoice + extraSpendSum;
   const totalGuests = months.reduce((sum,m) => sum + guestsFor(m), 0);
 
   const kpiHtml = pairs => pairs.map(([label,value]) => `
@@ -544,6 +559,7 @@ function renderCompare() {
     ["Total marketing spend", eur(totalSpend)],
     ["Meta Ads — spend", eur(metaTotals.spend)],
     ["Mailchimp — spend (invoices)", usd(mcTotals.invoice)],
+    ...extraTotals.map(v => [`${v.label} — spend`, eur(v.spend)]),
   ]);
   document.getElementById("compareKpiRowReach").innerHTML = kpiHtml([
     ["Meta Ads — total reach", fmt(metaTotals.viewers)],
