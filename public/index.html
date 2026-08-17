@@ -81,7 +81,7 @@
 
     <section id="spendPerGuestSection" style="display:none;">
       <h2>Total spend per guest, by month</h2>
-      <p class="desc">Combined marketing spend (Meta Ads + Mailchimp + Design + Opentable) divided by guest visits, for each month in the selected range. Shown only when the range covers more than one month — pick "All time" or a wider From/To range above to see it.</p>
+      <p class="desc">Combined marketing spend (Meta Ads + Mailchimp + Design + Triston + Opentable) divided by guest visits, for each month in the selected range. Shown only when the range covers more than one month — pick "All time" or a wider From/To range above to see it.</p>
       <div id="spendPerGuestChart"></div>
     </section>
 
@@ -156,10 +156,13 @@ let currentMonth = { mailchimp: null, meta: null };
 let currentView = "chart";
 
 // Additional marketing vendors not tied to Mailchimp/Meta. Each vendor has a per-month
-// spend map. "Design" (formerly "Kyte") was a flat €691/mo Jan–Jul 2026, and continues
-// as a flat €200/mo Aug–Dec 2026. "Opentable" (formerly "Triston") was a flat
-// €1600/mo Jan–Jul 2026, and from Aug 2026 onward reflects the real OpenTable invoice
-// total for that month (pulled from OpenTable's billing history) rather than a flat fee.
+// spend map.
+// - "Design" (formerly "Kyte"): flat €691/mo Jan–Jul 2026, then flat €200/mo Aug–Dec 2026.
+// - "Triston": flat €1600/mo Jan–Jul 2026 only — dropped entirely from Aug 2026 onward.
+// - "Opentable": a separate line for every month, Jan 2026 onward, using the real
+//   OpenTable invoice total for that month (pulled from OpenTable's billing history —
+//   see OPENTABLE_INVOICES below). This runs alongside Kyte/Triston in Jan–Jul, and
+//   alongside Design (with Triston gone) from Aug onward.
 const EXTRA_VENDORS = [
   {
     key: "design", label: "Design",
@@ -170,13 +173,16 @@ const EXTRA_VENDORS = [
     },
   },
   {
-    key: "opentable", label: "Opentable",
+    key: "triston", label: "Triston",
     monthly: {
       "2026-01": 1600, "2026-02": 1600, "2026-03": 1600, "2026-04": 1600,
       "2026-05": 1600, "2026-06": 1600, "2026-07": 1600,
-      // Aug 2026 onward: real OpenTable invoice totals (see OPENTABLE_INVOICES) —
-      // left out here until an invoice is issued for that month.
+      // No entries from Aug 2026 onward — Triston is discontinued.
     },
+  },
+  {
+    key: "opentable", label: "Opentable",
+    monthly: {}, // populated below from OPENTABLE_INVOICES, for every billed month
   },
 ];
 function extraVendorSpendForMonths(vendor, months) {
@@ -189,8 +195,7 @@ const OPENTABLE_INVOICES = {
   "2026-01": 625.35, "2026-02": 291.55, "2026-03": 405.79, "2026-04": 587.67,
   "2026-05": 252.88, "2026-06": 233.24, "2026-07": 242.17,
 };
-// Keep the Design/Opentable extra-vendor spend map in sync with the real invoice totals
-// for any month an invoice exists.
+// Feed the real invoice totals into the "Opentable" extra-vendor line for every billed month.
 Object.entries(OPENTABLE_INVOICES).forEach(([m, amt]) => {
   const vendor = EXTRA_VENDORS.find(v => v.key === "opentable");
   if (vendor) vendor.monthly[m] = amt;
