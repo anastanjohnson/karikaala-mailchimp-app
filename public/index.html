@@ -23,6 +23,7 @@
     <button class="toggle-btn active" id="tabCompare" onclick="setChannel('compare')">Compare channels</button>
     <button class="toggle-btn" id="tabMailchimp" onclick="setChannel('mailchimp')">Mailchimp</button>
     <button class="toggle-btn" id="tabMeta" onclick="setChannel('meta')">Meta Ads</button>
+    <button class="toggle-btn" id="tabOpentable" onclick="setChannel('opentable')">Opentable</button>
   </div>
 
   <!-- Single-channel view -->
@@ -80,7 +81,7 @@
 
     <section id="spendPerGuestSection" style="display:none;">
       <h2>Total spend per guest, by month</h2>
-      <p class="desc">Combined marketing spend (Meta Ads + Mailchimp + Kyte + Triston) divided by guest visits, for each month in the selected range. Shown only when the range covers more than one month — pick "All time" or a wider From/To range above to see it.</p>
+      <p class="desc">Combined marketing spend (Meta Ads + Mailchimp + Design + Opentable) divided by guest visits, for each month in the selected range. Shown only when the range covers more than one month — pick "All time" or a wider From/To range above to see it.</p>
       <div id="spendPerGuestChart"></div>
     </section>
 
@@ -118,6 +119,26 @@
     </section>
   </div>
 
+  <!-- Opentable view -->
+  <div id="opentableView" style="display:none;">
+    <div class="kpi-group kpi-group-spend">
+      <div class="kpi-group-heading"><span class="kpi-group-dot"></span>OpenTable</div>
+      <div class="kpi-row" id="opentableKpiRow" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));"></div>
+    </div>
+
+    <section>
+      <h2>Monthly OpenTable expense</h2>
+      <p class="desc">OpenTable subscription/billing invoice total for each month of 2026, pulled from OpenTable's billing history. Months without a bar yet don't have an invoice available.</p>
+      <div class="month-bars" id="opentableExpenseBars"></div>
+    </section>
+
+    <section>
+      <h2>Monthly summary — expenses, experiences &amp; covers</h2>
+      <p class="desc">Expense is the OpenTable invoice total for the month. Active experiences lists what was live during that month. Covers by source is pulled from the Reservations report for that month's Visit Date range.</p>
+      <div id="opentableTable"></div>
+    </section>
+  </div>
+
   <footer>Source: Meta Ads Manager + Mailchimp campaign reports. Data is served live from this site's backend — use the <a href="/admin">Admin</a> page to add new months.</footer>
 </div>
 
@@ -134,17 +155,69 @@ let channel = "mailchimp";
 let currentMonth = { mailchimp: null, meta: null };
 let currentView = "chart";
 
-// Additional marketing vendors not tied to Mailchimp/Meta — flat spend charged every
-// month within a fixed Jan–Jul 2026 period.
-const EXTRA_VENDOR_MONTHS = ["2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07"];
+// Additional marketing vendors not tied to Mailchimp/Meta. Each vendor has a per-month
+// spend map. "Design" (formerly "Kyte") was a flat €691/mo Jan–Jul 2026, and continues
+// as a flat €200/mo Aug–Dec 2026. "Opentable" (formerly "Triston") was a flat
+// €1600/mo Jan–Jul 2026, and from Aug 2026 onward reflects the real OpenTable invoice
+// total for that month (pulled from OpenTable's billing history) rather than a flat fee.
 const EXTRA_VENDORS = [
-  { key: "kyte", label: "Kyte", perMonth: 691 },
-  { key: "triston", label: "Triston", perMonth: 1600 },
+  {
+    key: "design", label: "Design",
+    monthly: {
+      "2026-01": 691, "2026-02": 691, "2026-03": 691, "2026-04": 691,
+      "2026-05": 691, "2026-06": 691, "2026-07": 691,
+      "2026-08": 200, "2026-09": 200, "2026-10": 200, "2026-11": 200, "2026-12": 200,
+    },
+  },
+  {
+    key: "opentable", label: "Opentable",
+    monthly: {
+      "2026-01": 1600, "2026-02": 1600, "2026-03": 1600, "2026-04": 1600,
+      "2026-05": 1600, "2026-06": 1600, "2026-07": 1600,
+      // Aug 2026 onward: real OpenTable invoice totals (see OPENTABLE_INVOICES) —
+      // left out here until an invoice is issued for that month.
+    },
+  },
 ];
 function extraVendorSpendForMonths(vendor, months) {
-  const count = months.filter(m => EXTRA_VENDOR_MONTHS.includes(m)).length;
-  return vendor.perMonth * count;
+  return months.reduce((s, m) => s + (vendor.monthly[m] || 0), 0);
 }
+
+// ---- Opentable tab data (pulled manually from OpenTable Guest Center) ----
+// Real monthly invoice totals from Billing History (Aug 2026 not yet billed).
+const OPENTABLE_INVOICES = {
+  "2026-01": 625.35, "2026-02": 291.55, "2026-03": 405.79, "2026-04": 587.67,
+  "2026-05": 252.88, "2026-06": 233.24, "2026-07": 242.17,
+};
+// Keep the Design/Opentable extra-vendor spend map in sync with the real invoice totals
+// for any month an invoice exists.
+Object.entries(OPENTABLE_INVOICES).forEach(([m, amt]) => {
+  const vendor = EXTRA_VENDORS.find(v => v.key === "opentable");
+  if (vendor) vendor.monthly[m] = amt;
+});
+
+// Active experiences per month, from the Experiences page (statuses as of Aug 2026).
+const OPENTABLE_EXPERIENCES = {
+  "2026-01": ["All You Can Experience – Saturday Lunch Experience"],
+  "2026-02": ["All You Can Experience – Saturday Lunch Experience"],
+  "2026-03": ["All You Can Experience – Saturday Lunch Experience"],
+  "2026-04": ["All You Can Experience – Saturday Lunch Experience"],
+  "2026-05": ["All You Can Experience – Saturday Lunch Experience", "Summer Terrace Experience"],
+  "2026-06": ["All You Can Experience – Saturday Lunch Experience", "Summer Terrace Experience"],
+  "2026-07": ["All You Can Experience – Saturday Lunch Experience", "Summer Terrace Experience"],
+  "2026-08": ["All You Can Experience – Saturday Lunch Experience", "Summer Terrace Experience"],
+};
+// Total covers by source per month, from the Reservations report (Visit Date range = calendar month).
+const OPENTABLE_COVERS = {
+  "2026-01": { covers: 1504, reservations: 453, opentableNetwork: 271, yourNetwork: 661, otherNetworks: 0, phone: 294, walkin: 278 },
+  "2026-02": { covers: 444, reservations: 125, opentableNetwork: 84, yourNetwork: 187, otherNetworks: 0, phone: 93, walkin: 80 },
+  "2026-03": { covers: 875, reservations: 295, opentableNetwork: 148, yourNetwork: 534, otherNetworks: 0, phone: 72, walkin: 121 },
+  "2026-04": { covers: 1323, reservations: 406, opentableNetwork: 287, yourNetwork: 560, otherNetworks: 0, phone: 230, walkin: 246 },
+  "2026-05": { covers: 1598, reservations: 444, opentableNetwork: 422, yourNetwork: 505, otherNetworks: 0, phone: 332, walkin: 339 },
+  "2026-06": { covers: 880, reservations: 254, opentableNetwork: 232, yourNetwork: 189, otherNetworks: 0, phone: 228, walkin: 231 },
+  "2026-07": { covers: 1177, reservations: 369, opentableNetwork: 358, yourNetwork: 351, otherNetworks: 0, phone: 164, walkin: 304 },
+  "2026-08": { covers: 722, reservations: 210, opentableNetwork: 250, yourNetwork: 240, otherNetworks: 0, phone: 120, walkin: 112, partial: "1–17 Aug" },
+};
 
 const fmt = n => Number(n||0).toLocaleString("en-US");
 const eur = n => "€" + Number(n||0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -408,12 +481,79 @@ function setChannel(ch) {
   document.getElementById("tabMeta").classList.toggle("active", ch === "meta");
   document.getElementById("tabMeta").classList.toggle("ch-meta", ch === "meta");
   document.getElementById("tabCompare").classList.toggle("active", ch === "compare");
-  document.getElementById("singleView").style.display = ch === "compare" ? "none" : "";
+  document.getElementById("tabOpentable").classList.toggle("active", ch === "opentable");
+  document.getElementById("singleView").style.display = (ch === "mailchimp" || ch === "meta") ? "" : "none";
   document.getElementById("compareView").style.display = ch === "compare" ? "" : "none";
-  if (ch !== "compare") {
+  document.getElementById("opentableView").style.display = ch === "opentable" ? "" : "none";
+  if (ch === "opentable") {
+    renderOpentable();
+  } else if (ch !== "compare") {
     populateSingleMonthButtons();
     render();
   }
+}
+
+function renderOpentable() {
+  const months = Object.keys(OPENTABLE_COVERS).sort();
+  const totalExpense = months.reduce((s, m) => s + (OPENTABLE_INVOICES[m] || 0), 0);
+  const billedMonths = months.filter(m => OPENTABLE_INVOICES[m] != null);
+  const avgExpense = billedMonths.length ? totalExpense / billedMonths.length : 0;
+  const totalCovers = months.reduce((s, m) => s + (OPENTABLE_COVERS[m].covers || 0), 0);
+  const totalOtNetwork = months.reduce((s, m) => s + (OPENTABLE_COVERS[m].opentableNetwork || 0), 0);
+
+  const kpiHtml = pairs => pairs.map(([label,value,highlight]) => `
+    <div class="kpi${highlight ? ' kpi-highlight' : ''}"><div class="label">${label}</div><div class="value">${value}</div></div>
+  `).join("");
+  document.getElementById("opentableKpiRow").innerHTML = kpiHtml([
+    ["Total OpenTable spend (billed months)", eur(totalExpense), true],
+    ["Avg. monthly invoice", eur(avgExpense)],
+    ["Total covers, 2026", fmt(totalCovers)],
+    ["Covers via OpenTable Network", fmt(totalOtNetwork)],
+  ]);
+
+  const barsEl = document.getElementById("opentableExpenseBars");
+  const vals = months.map(m => OPENTABLE_INVOICES[m] || 0);
+  const max = Math.max(...vals, 1);
+  barsEl.innerHTML = months.map((m, i) => {
+    const has = OPENTABLE_INVOICES[m] != null;
+    const h = has ? Math.max((vals[i]/max*100), 2) : 2;
+    return `
+    <div class="month-col">
+      <div class="month-val">${has ? eur(vals[i]) : "—"}</div>
+      <div class="month-bar-wrap">
+        <div class="month-bar ${has ? '' : ''}" style="height:${h}%; opacity:${has ? 1 : 0.25};" data-tip="${MONTH_LABELS[m] || m} · ${has ? eur(vals[i]) : 'No invoice yet'}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
+      </div>
+      <div class="month-lbl">${MONTH_LABELS[m] || m}</div>
+    </div>`;
+  }).join("");
+
+  const rows = months.map(m => {
+    const c = OPENTABLE_COVERS[m];
+    const exp = OPENTABLE_INVOICES[m];
+    const exps = (OPENTABLE_EXPERIENCES[m] || []);
+    return `
+    <tr>
+      <td>${MONTH_LABELS[m] || m}${c.partial ? ` <span style="color:var(--text-muted); font-size:11px;">(${c.partial})</span>` : ""}</td>
+      <td class="num">${exp != null ? eur(exp) : "—"}</td>
+      <td>${exps.length ? exps.join("<br>") : "—"}</td>
+      <td class="num">${fmt(c.covers)}</td>
+      <td class="num">${fmt(c.reservations)}</td>
+      <td class="num">${fmt(c.opentableNetwork)}</td>
+      <td class="num">${fmt(c.yourNetwork)}</td>
+      <td class="num">${fmt(c.otherNetworks)}</td>
+      <td class="num">${fmt(c.phone)}</td>
+      <td class="num">${fmt(c.walkin)}</td>
+    </tr>`;
+  }).join("");
+  document.getElementById("opentableTable").innerHTML = `
+    <div style="overflow-x:auto;">
+    <table><thead><tr>
+      <th>Month</th><th class="num">Expense</th><th>Active experiences</th>
+      <th class="num">Covers</th><th class="num">Reservations</th>
+      <th class="num">OpenTable Network</th><th class="num">Your Network</th><th class="num">Other Networks</th>
+      <th class="num">Phone/In-house</th><th class="num">Walk-in</th>
+    </tr></thead><tbody>${rows}</tbody></table>
+    </div>`;
 }
 
 function toggleTheme() {
