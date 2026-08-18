@@ -994,7 +994,11 @@ function renderCompare() {
     ["Total marketing spend", eur(totalSpend), true],
     ["Meta Ads — spend", eur(metaTotals.spend)],
     ["Mailchimp — spend", eur(mcTotals.invoice)],
-    ...extraTotals.map(v => [`${v.label} — spend`, eur(v.spend)]),
+    ...extraTotals.map(v => {
+      let label = v.label;
+      if (v.key === "triston" && months.length && months.every(m => m >= "2026-08")) label = "Collaboration";
+      return [`${label} — spend`, eur(v.spend)];
+    }),
   ]);
   document.getElementById("compareKpiRowReach").innerHTML = kpiHtml([
     ["Meta Ads — total reach", fmt(metaTotals.viewers)],
