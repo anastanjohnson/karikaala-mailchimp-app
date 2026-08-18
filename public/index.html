@@ -147,7 +147,7 @@
 
     <section>
       <h2>Active experiences — guests seated</h2>
-      <p class="desc">Each active OpenTable Experience and how many guests were seated through it that month, pulled straight from the invoice ("Guests Seated from Experiences Booked on your Website" + "...from OpenTable Diner Network").</p>
+      <p class="desc">Each active OpenTable Experience and its real Covers (guests seated) for that month, pulled directly from OpenTable Guest Center's Experiences report. August 2026 covers 1–18 Aug (month in progress).</p>
       <div id="opentableExperienceGuests"></div>
     </section>
 
@@ -341,17 +341,46 @@ const OPENTABLE_INVOICE_ITEMS = {
   },
 };
 
-// Active experiences per month, from the Experiences page (statuses as of Aug 2026).
-const OPENTABLE_EXPERIENCES = {
-  "2026-01": ["All You Can Experience – Saturday Lunch Experience"],
-  "2026-02": ["All You Can Experience – Saturday Lunch Experience"],
-  "2026-03": ["All You Can Experience – Saturday Lunch Experience"],
-  "2026-04": ["All You Can Experience – Saturday Lunch Experience"],
-  "2026-05": ["All You Can Experience – Saturday Lunch Experience", "Summer Terrace Experience"],
-  "2026-06": ["All You Can Experience – Saturday Lunch Experience", "Summer Terrace Experience"],
-  "2026-07": ["All You Can Experience – Saturday Lunch Experience", "Summer Terrace Experience"],
-  "2026-08": ["All You Can Experience – Saturday Lunch Experience", "Summer Terrace Experience"],
+// Real per-experience Covers, pulled directly from OpenTable Guest Center's
+// Experiences report (guestcenter.opentable.com/restaurant/225459/reporting/experiences)
+// by setting the Visit Date range to each calendar month. Aug 2026 covers 1–18 Aug
+// (month in progress as of the pull date).
+const OPENTABLE_EXPERIENCE_COVERS = {
+  "2026-01": [
+    { name: "All You Can Experience – Saturday Lunch Experience", covers: 83 },
+  ],
+  "2026-02": [
+    { name: "All You Can Experience – Saturday Lunch Experience", covers: 16 },
+    { name: "Romantischer Valentinstisch ❤️🌹✨", covers: 2 },
+  ],
+  "2026-03": [
+    { name: "All You Can Experience – Saturday Lunch Experience", covers: 36 },
+  ],
+  "2026-04": [
+    { name: "All You Can Experience – Saturday Lunch Experience", covers: 100 },
+  ],
+  "2026-05": [
+    { name: "All You Can Experience – Saturday Lunch Experience", covers: 67 },
+    { name: "All you can BEER experience", covers: 37 },
+  ],
+  "2026-06": [
+    { name: "All You Can Experience – Saturday Lunch Experience", covers: 35 },
+    { name: "Summer Terrace Experience", covers: 17 },
+  ],
+  "2026-07": [
+    { name: "Summer Terrace Experience", covers: 132 },
+    { name: "All You Can Experience – Saturday Lunch Experience", covers: 64 },
+    { name: "Summer Cultural Night – Indian Classical Rhythms", covers: 30 },
+  ],
+  "2026-08": [
+    { name: "Summer Terrace Experience", covers: 85 },
+    { name: "All You Can Experience – Saturday Lunch Experience", covers: 25 },
+  ],
 };
+// Active experiences per month, derived from the Covers data above.
+const OPENTABLE_EXPERIENCES = Object.fromEntries(
+  Object.entries(OPENTABLE_EXPERIENCE_COVERS).map(([m, list]) => [m, list.map(e => e.name)])
+);
 // Total covers by source per month, from the Reservations report (Visit Date range = calendar month).
 const OPENTABLE_COVERS = {
   "2026-01": { covers: 1504, reservations: 453, opentableNetwork: 271, yourNetwork: 661, otherNetworks: 0, phone: 294, walkin: 278 },
@@ -784,19 +813,12 @@ function renderOpentableMonthDetail() {
   ]);
 }
 
-// Pulls the two "Guests Seated from Experiences Booked ..." line items off a month's
-// invoice (Website + OpenTable Diner Network) and sums them — this is the guest count
-// that actually came through the active Experience(s) that month, per OpenTable's own
-// billing data.
+// Real per-experience covers for a month, from OPENTABLE_EXPERIENCE_COVERS
+// (pulled directly from OpenTable Guest Center's Experiences report).
 function experienceGuestsForMonth(m) {
-  const inv = OPENTABLE_INVOICE_ITEMS[m];
-  if (!inv) return null;
-  let website = 0, dinerNetwork = 0;
-  inv.groups.forEach(g => g.items.forEach(it => {
-    if (it.desc === "Guests Seated from Experiences Booked on your Website") website += it.qty;
-    if (it.desc === "Guests Seated from Experiences Booked from OpenTable Diner Network") dinerNetwork += it.qty;
-  }));
-  return { website, dinerNetwork, total: website + dinerNetwork };
+  const list = OPENTABLE_EXPERIENCE_COVERS[m];
+  if (!list) return null;
+  return { total: list.reduce((s, e) => s + e.covers, 0) };
 }
 
 function renderOpentableExperienceGuests() {
@@ -805,27 +827,23 @@ function renderOpentableExperienceGuests() {
   const months = opentableMonths();
   const rows = [];
   months.forEach(m => {
-    const exps = OPENTABLE_EXPERIENCES[m] || [];
-    const g = experienceGuestsForMonth(m);
+    const list = OPENTABLE_EXPERIENCE_COVERS[m] || [];
     const isSel = m === opentableMonth;
-    const list = exps.length ? exps : ["—"];
-    list.forEach((exp, i) => {
+    const display = list.length ? list : [{ name: "—", covers: null }];
+    display.forEach((exp, i) => {
       rows.push(`
       <tr class="compare-row ${isSel ? 'selected-row' : ''}" style="cursor:pointer;" onclick="selectOpentableMonth('${m}')">
         <td>${i === 0 ? (MONTH_LABELS[m] || m) : ""}</td>
-        <td>${exp}</td>
-        <td class="num">${g ? fmt(g.website) : "—"}</td>
-        <td class="num">${g ? fmt(g.dinerNetwork) : "—"}</td>
-        <td class="num" style="font-weight:600;">${g ? fmt(g.total) : "—"}</td>
+        <td>${exp.name}</td>
+        <td class="num" style="font-weight:600;">${exp.covers != null ? fmt(exp.covers) : "—"}</td>
       </tr>`);
     });
   });
   el.innerHTML = `
-    <p class="desc" style="margin-top:-4px; margin-bottom:10px;">OpenTable's invoice reports guests seated per booking source (Website / Diner Network) for the month as a whole, not split out per Experience — so when more than one Experience is active in the same month, each gets its own row here but shares that month's totals.</p>
     <div style="overflow-x:auto;">
     <table><thead><tr>
       <th>Month</th><th>Experience</th>
-      <th class="num">Guests — Website booked</th><th class="num">Guests — Diner Network</th><th class="num">Total guests seated</th>
+      <th class="num">Covers (guests seated)</th>
     </tr></thead><tbody>${rows.join("")}</tbody></table>
     </div>`;
 }
