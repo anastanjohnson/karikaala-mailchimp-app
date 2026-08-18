@@ -139,7 +139,7 @@
       <div class="kpi-row" id="opentableMonthDetailKpis" style="grid-template-columns: repeat(4,1fr);"></div>
     </section>
 
-    <section>
+    <section id="opentableExpenseSection">
       <h2>Monthly OpenTable expense</h2>
       <p class="desc">OpenTable subscription/billing invoice total for each month of 2026, pulled from OpenTable's billing history. Months without a bar yet don't have an invoice available. Click a bar or a month button above to see that month's change vs. the previous month.</p>
       <div class="month-bars" id="opentableExpenseBars"></div>
@@ -853,6 +853,9 @@ function renderOpentable() {
   renderOpentableMonthButtons();
   renderOpentableMonthDetail();
   renderOpentableExperienceGuests();
+
+  const expenseSection = document.getElementById("opentableExpenseSection");
+  if (expenseSection) expenseSection.style.display = opentableMonth ? "none" : "";
 
   const kpiHtml = pairs => pairs.map(([label,value,highlight]) => `
     <div class="kpi${highlight ? ' kpi-highlight' : ''}"><div class="label">${label}</div><div class="value">${value}</div></div>
