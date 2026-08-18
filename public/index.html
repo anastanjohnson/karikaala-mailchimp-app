@@ -146,6 +146,12 @@
     </section>
 
     <section>
+      <h2>Active experiences — guests seated</h2>
+      <p class="desc">Each active OpenTable Experience and how many guests were seated through it that month, pulled straight from the invoice ("Guests Seated from Experiences Booked on your Website" + "...from OpenTable Diner Network").</p>
+      <div id="opentableExperienceGuests"></div>
+    </section>
+
+    <section>
       <h2>Monthly summary — expenses, experiences &amp; covers</h2>
       <p class="desc">Expense is the OpenTable invoice total for the month, with the change vs. the previous month. Active experiences lists what was live during that month. Covers by source is pulled from the Reservations report for that month's Visit Date range.</p>
       <div id="opentableTable"></div>
@@ -778,6 +784,47 @@ function renderOpentableMonthDetail() {
   ]);
 }
 
+// Pulls the two "Guests Seated from Experiences Booked ..." line items off a month's
+// invoice (Website + OpenTable Diner Network) and sums them — this is the guest count
+// that actually came through the active Experience(s) that month, per OpenTable's own
+// billing data.
+function experienceGuestsForMonth(m) {
+  const inv = OPENTABLE_INVOICE_ITEMS[m];
+  if (!inv) return null;
+  let website = 0, dinerNetwork = 0;
+  inv.groups.forEach(g => g.items.forEach(it => {
+    if (it.desc === "Guests Seated from Experiences Booked on your Website") website += it.qty;
+    if (it.desc === "Guests Seated from Experiences Booked from OpenTable Diner Network") dinerNetwork += it.qty;
+  }));
+  return { website, dinerNetwork, total: website + dinerNetwork };
+}
+
+function renderOpentableExperienceGuests() {
+  const el = document.getElementById("opentableExperienceGuests");
+  if (!el) return;
+  const months = opentableMonths();
+  const rows = months.map(m => {
+    const exps = OPENTABLE_EXPERIENCES[m] || [];
+    const g = experienceGuestsForMonth(m);
+    const isSel = m === opentableMonth;
+    return `
+    <tr class="compare-row ${isSel ? 'selected-row' : ''}" style="cursor:pointer;" onclick="selectOpentableMonth('${m}')">
+      <td>${MONTH_LABELS[m] || m}</td>
+      <td>${exps.length ? exps.join("<br>") : "—"}</td>
+      <td class="num">${g ? fmt(g.website) : "—"}</td>
+      <td class="num">${g ? fmt(g.dinerNetwork) : "—"}</td>
+      <td class="num" style="font-weight:600;">${g ? fmt(g.total) : "—"}</td>
+    </tr>`;
+  }).join("");
+  el.innerHTML = `
+    <div style="overflow-x:auto;">
+    <table><thead><tr>
+      <th>Month</th><th>Active experience(s)</th>
+      <th class="num">Guests — Website booked</th><th class="num">Guests — Diner Network</th><th class="num">Total guests seated</th>
+    </tr></thead><tbody>${rows}</tbody></table>
+    </div>`;
+}
+
 function renderOpentable() {
   const months = opentableMonths();
   const totalExpense = months.reduce((s, m) => s + (OPENTABLE_INVOICES[m] || 0), 0);
@@ -788,6 +835,7 @@ function renderOpentable() {
 
   renderOpentableMonthButtons();
   renderOpentableMonthDetail();
+  renderOpentableExperienceGuests();
 
   const kpiHtml = pairs => pairs.map(([label,value,highlight]) => `
     <div class="kpi${highlight ? ' kpi-highlight' : ''}"><div class="label">${label}</div><div class="value">${value}</div></div>
