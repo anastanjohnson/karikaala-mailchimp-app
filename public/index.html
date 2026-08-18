@@ -137,10 +137,6 @@
         </label>
       </div>
       <div class="kpi-row" id="opentableMonthDetailKpis" style="grid-template-columns: repeat(4,1fr);"></div>
-
-      <h3 style="margin-top:22px; font-size:14px;">How each invoice total is made up</h3>
-      <p class="desc">The actual line items from each month's OpenTable invoice PDF, as billed: system fees, guest-based marketing charges, net subtotal (Zwischensumme), 19% VAT (Mwst.), and total due (Gesamtbetrag).</p>
-      <div id="opentableInvoiceBreakdown"></div>
     </section>
 
     <section>
@@ -728,7 +724,6 @@ function renderOpentableMonthDetail() {
   const titleEl = document.getElementById("opentableMonthDetailTitle");
   const kpisEl = document.getElementById("opentableMonthDetailKpis");
   const compareSelectEl = document.getElementById("opentableCompareSelect");
-  const breakdownEl = document.getElementById("opentableInvoiceBreakdown");
   if (!section || !kpisEl) return;
   if (!opentableMonth) { section.style.display = "none"; return; }
   section.style.display = "";
@@ -781,14 +776,6 @@ function renderOpentableMonthDetail() {
     [`Change vs. ${compareM ? (MONTH_LABELS[compareM] || compareM) : "comparison month"}`, changeValue, changeExtra, false],
     ["Spend per guest", perGuest != null ? eur(perGuest) : "—", `<div class="delta">${eur(curr||0)} / ${fmt(covers)} covers</div>`, false],
   ]);
-
-  if (breakdownEl) {
-    breakdownEl.innerHTML = `
-      <div class="kpi-row" style="grid-template-columns: repeat(2,1fr);">
-        ${invoiceBreakdownRowHtml("Compare-to month", compareM)}
-        ${invoiceBreakdownRowHtml("Selected month", opentableMonth)}
-      </div>`;
-  }
 }
 
 function renderOpentable() {
