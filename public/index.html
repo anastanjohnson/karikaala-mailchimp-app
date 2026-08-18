@@ -139,7 +139,7 @@
       <div class="kpi-row" id="opentableMonthDetailKpis" style="grid-template-columns: repeat(4,1fr);"></div>
 
       <h3 style="margin-top:22px; font-size:14px;">How each invoice total is made up</h3>
-      <p class="desc">OpenTable invoices are net subtotal + 19% VAT (Mwst.) = total due (Gesamtbetrag). Subtotal and VAT below are derived from the invoice total at the standard German 19% rate.</p>
+      <p class="desc">The actual line items from each month's OpenTable invoice PDF, as billed: system fees, guest-based marketing charges, net subtotal (Zwischensumme), 19% VAT (Mwst.), and total due (Gesamtbetrag).</p>
       <div id="opentableInvoiceBreakdown"></div>
     </section>
 
@@ -219,6 +219,125 @@ Object.entries(OPENTABLE_INVOICES).forEach(([m, amt]) => {
   const vendor = EXTRA_VENDORS.find(v => v.key === "opentable");
   if (vendor) vendor.monthly[m] = amt;
 });
+
+// Real itemized invoice line items, transcribed from each month's OpenTable "Rechnung" PDF
+// (Billing History → Invoice → Download PDF). Zwischensumme = net subtotal, Mwst.19% = VAT,
+// Gesamtbetrag = total due. This is the actual template OpenTable uses to build each invoice.
+const OPENTABLE_INVOICE_ITEMS = {
+  "2026-01": {
+    groups: [
+      { heading: "Betrieb des Systems", items: [
+        { desc: "Guests Seated from Experiences Booked on your Website", qty: 67, price: 0, total: 0 },
+        { desc: "OpenTable Core", qty: 1, price: 99, total: 99 },
+        { desc: "Platzierte Gäste von Online-Reservierungen über Ihre Webseite (Core)", qty: 594, price: 0, total: 0 },
+        { desc: "Zahlungs Prozess Gebühr", qty: 1, price: 20, total: 20 },
+      ]},
+      { heading: "OpenTable Marketing", items: [
+        { desc: "Guests Seated from Experiences Booked from OpenTable Diner Network", qty: 16, price: 1.5, total: 24 },
+        { desc: "Platzierte Gäste über das OpenTable Gastnetzwerk (Core)", qty: 255, price: 1.5, total: 382.5 },
+      ]},
+    ],
+    subtotal: 525.50, vat: 99.85, total: 625.35,
+  },
+  "2026-02": {
+    groups: [
+      { heading: "Betrieb des Systems", items: [
+        { desc: "Guests Seated from Experiences Booked on your Website", qty: 10, price: 0, total: 0 },
+        { desc: "OpenTable Core", qty: 1, price: 99, total: 99 },
+        { desc: "Platzierte Gäste von Online-Reservierungen über Ihre Webseite (Core)", qty: 175, price: 0, total: 0 },
+        { desc: "Zahlungs Prozess Gebühr", qty: 1, price: 20, total: 20 },
+      ]},
+      { heading: "OpenTable Marketing", items: [
+        { desc: "Guests Seated from Experiences Booked from OpenTable Diner Network", qty: 6, price: 1.5, total: 9 },
+        { desc: "Platzierte Gäste über das OpenTable Gastnetzwerk (Core)", qty: 78, price: 1.5, total: 117 },
+      ]},
+    ],
+    subtotal: 245.00, vat: 46.55, total: 291.55,
+  },
+  "2026-03": {
+    groups: [
+      { heading: "Betrieb des Systems", items: [
+        { desc: "Guests Seated from Experiences Booked on your Website", qty: 34, price: 0, total: 0 },
+        { desc: "OpenTable Core", qty: 1, price: 99, total: 99 },
+        { desc: "Platzierte Gäste von Online-Reservierungen über Ihre Webseite (Core)", qty: 500, price: 0, total: 0 },
+        { desc: "Zahlungs Prozess Gebühr", qty: 1, price: 20, total: 20 },
+      ]},
+      { heading: "OpenTable Marketing", items: [
+        { desc: "Guests Seated from Experiences Booked from OpenTable Diner Network", qty: 2, price: 1.5, total: 3 },
+        { desc: "Platzierte Gäste über das OpenTable Gastnetzwerk (Core)", qty: 146, price: 1.5, total: 219 },
+      ]},
+    ],
+    subtotal: 341.00, vat: 64.79, total: 405.79,
+  },
+  "2026-04": {
+    groups: [
+      { heading: "Betrieb des Systems", items: [
+        { desc: "Guests Seated from Experiences Booked on your Website", qty: 81, price: 0, total: 0 },
+        { desc: "OpenTable Core", qty: 1, price: 99, total: 99 },
+        { desc: "Platzierte Gäste über das Google Partner Netzwerk", qty: 41, price: 0, total: 0 },
+        { desc: "Platzierte Gäste von Online-Reservierungen über Ihre Webseite (Core)", qty: 479, price: 0, total: 0 },
+        { desc: "Unlimited Google Covers - Monthly Subscription Fee (26/04–30/04)", qty: 1, price: 5.83, total: 5.83 },
+        { desc: "Zahlungs Prozess Gebühr", qty: 1, price: 20, total: 20 },
+      ]},
+      { heading: "OpenTable Marketing", items: [
+        { desc: "Guests Seated from Experiences Booked from OpenTable Diner Network", qty: 19, price: 1.5, total: 28.5 },
+        { desc: "Platzierte Gäste über das OpenTable Gastnetzwerk (Core)", qty: 227, price: 1.5, total: 340.5 },
+      ]},
+    ],
+    subtotal: 493.83, vat: 93.84, total: 587.67,
+  },
+  "2026-05": {
+    groups: [
+      { heading: "Betrieb des Systems", items: [
+        { desc: "Guests Seated from Experiences Booked on your Website", qty: 70, price: 0, total: 0 },
+        { desc: "OpenTable Core", qty: 1, price: 99, total: 99 },
+        { desc: "Platzierte Gäste über das Google Partner Netzwerk", qty: 383, price: 0, total: 0 },
+        { desc: "Platzierte Gäste von Online-Reservierungen über Ihre Webseite (Core)", qty: 435, price: 0, total: 0 },
+        { desc: "Unlimited Google Covers - Monthly Subscription Fee", qty: 1, price: 35, total: 35 },
+        { desc: "Zahlungs Prozess Gebühr", qty: 1, price: 20, total: 20 },
+      ]},
+      { heading: "OpenTable Marketing", items: [
+        { desc: "Guests Seated from Experiences Booked from OpenTable Diner Network", qty: 6, price: 1.5, total: 9 },
+        { desc: "Platzierte Gäste über das OpenTable Gastnetzwerk (Core)", qty: 33, price: 1.5, total: 49.5 },
+      ]},
+    ],
+    subtotal: 212.50, vat: 40.38, total: 252.88,
+  },
+  "2026-06": {
+    groups: [
+      { heading: "Betrieb des Systems", items: [
+        { desc: "Guests Seated from Experiences Booked on your Website", qty: 30, price: 0, total: 0 },
+        { desc: "OpenTable Core", qty: 1, price: 99, total: 99 },
+        { desc: "Platzierte Gäste über das Google Partner Netzwerk", qty: 204, price: 0, total: 0 },
+        { desc: "Platzierte Gäste von Online-Reservierungen über Ihre Webseite (Core)", qty: 159, price: 0, total: 0 },
+        { desc: "Unlimited Google Covers - Monthly Subscription Fee", qty: 1, price: 35, total: 35 },
+        { desc: "Zahlungs Prozess Gebühr", qty: 1, price: 20, total: 20 },
+      ]},
+      { heading: "OpenTable Marketing", items: [
+        { desc: "Guests Seated from Experiences Booked from OpenTable Diner Network", qty: 2, price: 1.5, total: 3 },
+        { desc: "Platzierte Gäste über das OpenTable Gastnetzwerk (Core)", qty: 26, price: 1.5, total: 39 },
+      ]},
+    ],
+    subtotal: 196.00, vat: 37.24, total: 233.24,
+  },
+  "2026-07": {
+    groups: [
+      { heading: "Betrieb des Systems", items: [
+        { desc: "Guests Seated from Experiences Booked on your Website", qty: 133, price: 0, total: 0 },
+        { desc: "OpenTable Core", qty: 1, price: 99, total: 99 },
+        { desc: "Platzierte Gäste über das Google Partner Netzwerk", qty: 325, price: 0, total: 0 },
+        { desc: "Platzierte Gäste von Online-Reservierungen über Ihre Webseite (Core)", qty: 218, price: 0, total: 0 },
+        { desc: "Unlimited Google Covers - Monthly Subscription Fee", qty: 1, price: 35, total: 35 },
+        { desc: "Zahlungs Prozess Gebühr", qty: 1, price: 20, total: 20 },
+      ]},
+      { heading: "OpenTable Marketing", items: [
+        { desc: "Guests Seated from Experiences Booked from OpenTable Diner Network", qty: 12, price: 1.5, total: 18 },
+        { desc: "Platzierte Gäste über das OpenTable Gastnetzwerk (Core)", qty: 21, price: 1.5, total: 31.5 },
+      ]},
+    ],
+    subtotal: 203.50, vat: 38.67, total: 242.17,
+  },
+};
 
 // Active experiences per month, from the Experiences page (statuses as of Aug 2026).
 const OPENTABLE_EXPERIENCES = {
@@ -570,22 +689,37 @@ function invoiceBreakdown(total) {
 }
 
 function invoiceBreakdownRowHtml(label, m) {
+  const real = m ? OPENTABLE_INVOICE_ITEMS[m] : null;
   const amt = m ? OPENTABLE_INVOICES[m] : null;
-  const b = invoiceBreakdown(amt);
+  const b = real || invoiceBreakdown(amt);
+  if (!b) {
+    return `
+      <div class="kpi" style="text-align:left;">
+        <div class="label">${label}${m ? ` — ${MONTH_LABELS[m] || m}` : ""}</div>
+        <div class="value" style="margin-top:6px;">—</div><div class="delta">No invoice yet</div>
+      </div>`;
+  }
+  const lineRows = real ? real.groups.map(g => `
+    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.02em; color:var(--text-muted); margin-top:10px;">${g.heading}</div>
+    ${g.items.map(it => `
+      <div style="display:flex; justify-content:space-between; gap:8px; font-size:12px; color:var(--text-secondary); margin-top:4px;">
+        <span style="flex:1;">${it.desc} <span style="color:var(--text-muted);">× ${fmt(it.qty)}${it.price ? ` @ ${eur(it.price)}` : ""}</span></span>
+        <span style="white-space:nowrap;">${eur(it.total)}</span>
+      </div>`).join("")}
+  `).join("") : "";
   return `
     <div class="kpi" style="text-align:left;">
       <div class="label">${label}${m ? ` — ${MONTH_LABELS[m] || m}` : ""}</div>
-      ${b ? `
-        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-top:6px;">
-          <span>Net subtotal</span><span>${eur(b.subtotal)}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-top:2px;">
-          <span>+ VAT (19%)</span><span>${eur(b.vat)}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-weight:700; margin-top:6px; padding-top:6px; border-top:1px solid var(--border);">
-          <span>Total due</span><span>${eur(b.total)}</span>
-        </div>
-      ` : `<div class="value" style="margin-top:6px;">—</div><div class="delta">No invoice yet</div>`}
+      ${lineRows}
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-top:10px; padding-top:8px; border-top:1px solid var(--border);">
+        <span>Zwischensumme (net subtotal)</span><span>${eur(b.subtotal)}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-top:2px;">
+        <span>+ Mwst. (VAT 19%)</span><span>${eur(b.vat)}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-weight:700; margin-top:6px; padding-top:6px; border-top:1px solid var(--border);">
+        <span>Gesamtbetrag (total due)</span><span>${eur(b.total)}</span>
+      </div>
     </div>`;
 }
 
