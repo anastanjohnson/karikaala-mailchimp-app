@@ -824,25 +824,19 @@ function experienceGuestsForMonth(m) {
 function renderOpentableExperienceGuests() {
   const el = document.getElementById("opentableExperienceGuests");
   if (!el) return;
-  const months = opentableMonths();
-  const rows = [];
-  months.forEach(m => {
-    const list = OPENTABLE_EXPERIENCE_COVERS[m] || [];
-    const isSel = m === opentableMonth;
-    const display = list.length ? list : [{ name: "—", covers: null }];
-    display.forEach((exp, i) => {
-      rows.push(`
-      <tr class="compare-row ${isSel ? 'selected-row' : ''}" style="cursor:pointer;" onclick="selectOpentableMonth('${m}')">
-        <td>${i === 0 ? (MONTH_LABELS[m] || m) : ""}</td>
+  const m = opentableMonth;
+  const list = OPENTABLE_EXPERIENCE_COVERS[m] || [];
+  const display = list.length ? list : [{ name: "—", covers: null }];
+  const rows = display.map(exp => `
+      <tr class="compare-row">
         <td>${exp.name}</td>
         <td class="num" style="font-weight:600;">${exp.covers != null ? fmt(exp.covers) : "—"}</td>
       </tr>`);
-    });
-  });
   el.innerHTML = `
+    <p class="desc" style="margin-top:-4px; margin-bottom:10px;">Showing ${MONTH_LABELS[m] || m} — click a different month above to switch.</p>
     <div style="overflow-x:auto;">
     <table><thead><tr>
-      <th>Month</th><th>Experience</th>
+      <th>Experience</th>
       <th class="num">Covers (guests seated)</th>
     </tr></thead><tbody>${rows.join("")}</tbody></table>
     </div>`;
