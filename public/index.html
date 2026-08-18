@@ -682,7 +682,7 @@ function opentableInvoiceDeltaHtml(m) {
 }
 
 function selectOpentableMonth(m) {
-  opentableMonth = (opentableMonth === m) ? null : m;
+  opentableMonth = (m === null) ? null : ((opentableMonth === m) ? null : m);
   opentableCompareMonth = null; // reset manual comparison — default back to "previous month" for the new selection
   renderOpentable();
 }
@@ -699,7 +699,8 @@ function renderOpentableMonthButtons() {
   const months = opentableMonths();
   const names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const year = months.length ? months[0].split("-")[0] : "2026";
-  el.innerHTML = names.map((name, i) => {
+  const allTimeBtn = `<button type="button" class="toggle-btn${!opentableMonth ? ' active' : ''}" onclick="selectOpentableMonth(null)">All time</button>`;
+  const monthBtns = names.map((name, i) => {
     const m = `${year}-${String(i + 1).padStart(2, "0")}`;
     const hasData = months.includes(m);
     const active = opentableMonth === m;
@@ -708,6 +709,7 @@ function renderOpentableMonthButtons() {
     if (!hasData) cls.push("disabled");
     return `<button type="button" class="${cls.join(' ')}" ${hasData ? `onclick="selectOpentableMonth('${m}')"` : "disabled"}>${name}</button>`;
   }).join("");
+  el.innerHTML = allTimeBtn + monthBtns;
 }
 
 // Derive a net-subtotal / 19% VAT / total breakdown from an invoice's gross total —
@@ -825,6 +827,34 @@ function renderOpentableExperienceGuests() {
   const el = document.getElementById("opentableExperienceGuests");
   if (!el) return;
   const m = opentableMonth;
+
+  if (!m) {
+    // All time — show every month's experiences together.
+    const months = opentableMonths();
+    const rows = [];
+    months.forEach(mm => {
+      const list = OPENTABLE_EXPERIENCE_COVERS[mm] || [];
+      const display = list.length ? list : [{ name: "—", covers: null }];
+      display.forEach((exp, i) => {
+        rows.push(`
+        <tr class="compare-row" style="cursor:pointer;" onclick="selectOpentableMonth('${mm}')">
+          <td>${i === 0 ? (MONTH_LABELS[mm] || mm) : ""}</td>
+          <td>${exp.name}</td>
+          <td class="num" style="font-weight:600;">${exp.covers != null ? fmt(exp.covers) : "—"}</td>
+        </tr>`);
+      });
+    });
+    el.innerHTML = `
+      <p class="desc" style="margin-top:-4px; margin-bottom:10px;">Showing all months — click a month above (or a row) to see just that month.</p>
+      <div style="overflow-x:auto;">
+      <table><thead><tr>
+        <th>Month</th><th>Experience</th>
+        <th class="num">Covers (guests seated)</th>
+      </tr></thead><tbody>${rows.join("")}</tbody></table>
+      </div>`;
+    return;
+  }
+
   const list = OPENTABLE_EXPERIENCE_COVERS[m] || [];
   const display = list.length ? list : [{ name: "—", covers: null }];
   const rows = display.map(exp => `
