@@ -130,8 +130,17 @@
 
     <section id="opentableMonthDetailSection">
       <h2 id="opentableMonthDetailTitle">Month detail</h2>
-      <p class="desc">The OpenTable invoice for the selected month, compared to the previous month's invoice.</p>
+      <p class="desc" id="opentableMonthDetailDesc">The OpenTable invoice for the selected month, compared to another month's invoice.</p>
+      <div class="controls" style="margin-bottom:14px; max-width:320px;">
+        <label style="font-size:12px; color:var(--text-muted); flex:1;">Compare to
+          <select id="opentableCompareSelect" onchange="onOpentableCompareChange()" style="width:100%;"></select>
+        </label>
+      </div>
       <div class="kpi-row" id="opentableMonthDetailKpis" style="grid-template-columns: repeat(4,1fr);"></div>
+
+      <h3 style="margin-top:22px; font-size:14px;">How each invoice total is made up</h3>
+      <p class="desc">OpenTable invoices are net subtotal + 19% VAT (Mwst.) = total due (Gesamtbetrag). Subtotal and VAT below are derived from the invoice total at the standard German 19% rate.</p>
+      <div id="opentableInvoiceBreakdown"></div>
     </section>
 
     <section>
@@ -163,6 +172,7 @@ let channel = "mailchimp";
 let currentMonth = { mailchimp: null, meta: null };
 let currentView = "chart";
 let opentableMonth = null;
+let opentableCompareMonth = null; // manually chosen "compare to" month; null = auto (previous month)
 
 // Additional marketing vendors not tied to Mailchimp/Meta. Each vendor has a per-month
 // spend map.
@@ -523,6 +533,13 @@ function opentableInvoiceDeltaHtml(m) {
 
 function selectOpentableMonth(m) {
   opentableMonth = (opentableMonth === m) ? null : m;
+  opentableCompareMonth = null; // reset manual comparison — default back to "previous month" for the new selection
+  renderOpentable();
+}
+
+function onOpentableCompareChange() {
+  const sel = document.getElementById("opentableCompareSelect");
+  opentableCompareMonth = sel.value || null;
   renderOpentable();
 }
 
@@ -543,21 +560,64 @@ function renderOpentableMonthButtons() {
   }).join("");
 }
 
+// Derive a net-subtotal / 19% VAT / total breakdown from an invoice's gross total —
+// matches the OpenTable invoice structure (Zwischensumme + Mwst. 19% = Gesamtbetrag).
+function invoiceBreakdown(total) {
+  if (total == null) return null;
+  const subtotal = total / 1.19;
+  const vat = total - subtotal;
+  return { subtotal, vat, total };
+}
+
+function invoiceBreakdownRowHtml(label, m) {
+  const amt = m ? OPENTABLE_INVOICES[m] : null;
+  const b = invoiceBreakdown(amt);
+  return `
+    <div class="kpi" style="text-align:left;">
+      <div class="label">${label}${m ? ` — ${MONTH_LABELS[m] || m}` : ""}</div>
+      ${b ? `
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-top:6px;">
+          <span>Net subtotal</span><span>${eur(b.subtotal)}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-top:2px;">
+          <span>+ VAT (19%)</span><span>${eur(b.vat)}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-weight:700; margin-top:6px; padding-top:6px; border-top:1px solid var(--border);">
+          <span>Total due</span><span>${eur(b.total)}</span>
+        </div>
+      ` : `<div class="value" style="margin-top:6px;">—</div><div class="delta">No invoice yet</div>`}
+    </div>`;
+}
+
 function renderOpentableMonthDetail() {
   const section = document.getElementById("opentableMonthDetailSection");
   const titleEl = document.getElementById("opentableMonthDetailTitle");
   const kpisEl = document.getElementById("opentableMonthDetailKpis");
+  const compareSelectEl = document.getElementById("opentableCompareSelect");
+  const breakdownEl = document.getElementById("opentableInvoiceBreakdown");
   if (!section || !kpisEl) return;
   if (!opentableMonth) { section.style.display = "none"; return; }
   section.style.display = "";
 
   const months = opentableMonths();
   const idx = months.indexOf(opentableMonth);
-  const prevM = idx > 0 ? months[idx - 1] : null;
+  const autoPrevM = idx > 0 ? months[idx - 1] : null;
+  const compareM = opentableCompareMonth || autoPrevM;
   const curr = OPENTABLE_INVOICES[opentableMonth];
-  const prev = prevM ? OPENTABLE_INVOICES[prevM] : null;
+  const prev = compareM ? OPENTABLE_INVOICES[compareM] : null;
 
   titleEl.textContent = `Month detail — ${MONTH_LABELS[opentableMonth] || opentableMonth}`;
+
+  // Populate the "Compare to" dropdown with every other month, manual selection wins.
+  if (compareSelectEl) {
+    const options = months.filter(m => m !== opentableMonth).map(m => {
+      const sel = m === compareM ? "selected" : "";
+      const isAuto = !opentableCompareMonth && m === autoPrevM;
+      return `<option value="${m}" ${sel}>${MONTH_LABELS[m] || m}${isAuto ? " (previous month)" : ""}</option>`;
+    }).join("");
+    compareSelectEl.innerHTML = `<option value="">— choose a month —</option>${options}`;
+    compareSelectEl.value = compareM || "";
+  }
 
   const kpiHtml = pairs => pairs.map(([label,value,extra,highlight]) => `
     <div class="kpi${highlight ? ' kpi-highlight' : ''}"><div class="label">${label}</div><div class="value">${value}</div>${extra || ""}</div>
@@ -570,9 +630,9 @@ function renderOpentableMonthDetail() {
     const sign = diff >= 0 ? "+" : "";
     changeValue = `${sign}${eur(diff)}`;
     changeExtra = `<div class="delta ${diff <= 0 ? 'up' : 'down'}">${sign}${pct.toFixed(0)}%</div>`;
-  } else if (curr != null && !prevM) {
+  } else if (curr != null && !compareM) {
     changeValue = "—";
-    changeExtra = `<div class="delta">First billed month</div>`;
+    changeExtra = `<div class="delta">No comparison month chosen</div>`;
   } else if (curr == null) {
     changeValue = "—";
     changeExtra = `<div class="delta">No invoice yet</div>`;
@@ -582,11 +642,19 @@ function renderOpentableMonthDetail() {
   const perGuest = (curr != null && covers > 0) ? curr / covers : null;
 
   kpisEl.innerHTML = kpiHtml([
-    [prevM ? `${MONTH_LABELS[prevM]} invoice` : "Previous month invoice", prev != null ? eur(prev) : "—", "", false],
+    [compareM ? `${MONTH_LABELS[compareM]} invoice` : "Compare-to invoice", prev != null ? eur(prev) : "—", "", false],
     [`${MONTH_LABELS[opentableMonth]} invoice`, curr != null ? eur(curr) : "—", "", true],
-    ["Change vs. previous month", changeValue, changeExtra, false],
+    [`Change vs. ${compareM ? (MONTH_LABELS[compareM] || compareM) : "comparison month"}`, changeValue, changeExtra, false],
     ["Spend per guest", perGuest != null ? eur(perGuest) : "—", `<div class="delta">${eur(curr||0)} / ${fmt(covers)} covers</div>`, false],
   ]);
+
+  if (breakdownEl) {
+    breakdownEl.innerHTML = `
+      <div class="kpi-row" style="grid-template-columns: repeat(2,1fr);">
+        ${invoiceBreakdownRowHtml("Compare-to month", compareM)}
+        ${invoiceBreakdownRowHtml("Selected month", opentableMonth)}
+      </div>`;
+  }
 }
 
 function renderOpentable() {
