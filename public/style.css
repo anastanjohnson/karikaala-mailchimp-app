@@ -133,5 +133,7 @@ form.admin-form input, form.admin-form select { width: 100%; }
 #compareMonthButtons.full-row > .toggle-btn { flex: 1; text-align: center; padding-left: 4px; padding-right: 4px; }
 .toggle-btn.disabled { opacity: 0.35; cursor: not-allowed; }
 .toggle-btn.disabled:hover { filter: none; }
+.toggle-btn.predicted { border-style: dashed; opacity: 0.85; }
+.toggle-btn.predicted:not(.active) { color: var(--text-muted); }
 @media (max-width: 700px) { #compareMonthButtons.full-row { flex-wrap: wrap; } #compareMonthButtons.full-row > .toggle-btn { flex: 1 1 22%; } }
 @media (max-width: 900px) { .kpi-row { grid-template-columns: repeat(3, 1fr); } .bar-label { width: 130px; } form.admin-form { grid-template-columns: repeat(2, 1fr); } }

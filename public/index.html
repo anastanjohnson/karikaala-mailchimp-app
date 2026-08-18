@@ -944,18 +944,92 @@ function renderCompareMonthButtons() {
   el.innerHTML = names.map((name, i) => {
     const m = `${year}-${String(i + 1).padStart(2, "0")}`;
     const hasData = months.includes(m);
+    // Sep–Dec have no real data yet, but stay clickable — selecting one shows a
+    // predicted average monthly invoice instead of an empty/disabled state.
+    const isPredictable = !hasData && months.length > 0 && m > months[months.length - 1];
     const active = isSingleMonthSelected && compareRange.from === m;
     const cls = ["toggle-btn"];
     if (active) cls.push("active");
-    if (!hasData) cls.push("disabled");
-    return `<button type="button" class="${cls.join(' ')}" ${hasData ? `onclick="selectCompareSingleMonth('${m}')"` : "disabled"}>${name}</button>`;
+    if (!hasData) cls.push(isPredictable ? "predicted" : "disabled");
+    const clickable = hasData || isPredictable;
+    return `<button type="button" class="${cls.join(' ')}" ${clickable ? `onclick="selectCompareSingleMonth('${m}')"` : "disabled"}>${name}</button>`;
   }).join("");
 }
 
 function monthsInRange() {
   const all = allMonthsUnion();
   if (!compareRange.from || !compareRange.to) return all;
+  // Single month selected (e.g. via a month button) — trust it even if it has no real
+  // data yet (a future/predicted month like Sep–Dec), instead of filtering it out.
+  if (compareRange.from === compareRange.to) return [compareRange.from];
   return all.filter(m => m >= compareRange.from && m <= compareRange.to);
+}
+
+// Average of the last few billed months — used to forecast an "expected" monthly
+// invoice for months that don't have real data yet (Sep–Dec).
+function predictedTotalsForMonth() {
+  const allMonths = allMonthsUnion();
+  const hist = allMonths.slice(-3); // last up to 3 billed months
+  const n = hist.length || 1;
+  const avgMc = hist.reduce((s, mm) => s + invoiceFor(mm), 0) / n;
+  const avgMeta = hist.reduce((s, mm) => s + computeKpisMeta(itemsFor("meta", mm)).spend, 0) / n;
+  const avgExtra = EXTRA_VENDORS.map(v => ({ ...v, spend: hist.reduce((s, mm) => s + (v.monthly[mm] || 0), 0) / n }));
+  const avgExtraSum = avgExtra.reduce((s, v) => s + v.spend, 0);
+  const avgGuests = hist.reduce((s, mm) => s + guestsFor(mm), 0) / n;
+  return { avgMc, avgMeta, avgExtra, avgExtraSum, avgGuests, histCount: n, histMonths: hist };
+}
+
+function renderComparePredicted(m) {
+  const kpiHtml = pairs => pairs.map(([label,value,highlight]) => `
+    <div class="kpi${highlight ? ' kpi-highlight' : ''}"><div class="label">${label}</div><div class="value">${value}</div></div>
+  `).join("");
+
+  const p = predictedTotalsForMonth();
+  const totalSpend = p.avgMc + p.avgMeta + p.avgExtraSum;
+  const histLabel = p.histMonths.map(x => MONTH_LABELS[x] || x).join(", ");
+
+  document.getElementById("compareRangeLabel").textContent =
+    `${MONTH_LABELS[m] || m} — predicted (average of last ${p.histCount} month${p.histCount===1?"":"s"}: ${histLabel})`;
+
+  document.getElementById("compareKpiRowSpend").innerHTML = kpiHtml([
+    ["Average monthly invoice (predicted)", eur(totalSpend), true],
+    ["Meta Ads — predicted spend", eur(p.avgMeta)],
+    ["Mailchimp — predicted spend", eur(p.avgMc)],
+    ...p.avgExtra.map(v => {
+      let label = v.label;
+      if (v.key === "triston") label = "Collaboration";
+      return [`${label} — predicted spend`, eur(v.spend)];
+    }),
+  ]);
+  document.getElementById("compareKpiRowReach").innerHTML =
+    `<div class="empty-state" style="grid-column:1/-1;">No campaigns logged yet for ${MONTH_LABELS[m] || m} — reach/opens can't be predicted.</div>`;
+  document.getElementById("compareKpiRowGuests").innerHTML = kpiHtml([
+    ["Predicted guest visits", fmt(Math.round(p.avgGuests))],
+    ["Predicted spend per guest", perGuestLabel(totalSpend, p.avgGuests, eur), true],
+  ]);
+
+  const spendSection = document.getElementById("spendPerGuestSection");
+  if (spendSection) spendSection.style.display = "none";
+
+  const barsEl = document.getElementById("compareBars");
+  const singleEl = document.getElementById("compareSingleMonthChart");
+  const titleEl = document.getElementById("compareChartTitle");
+  const descEl = document.getElementById("compareChartDesc");
+  const legendEl = document.getElementById("compareChartLegend");
+  if (legendEl) legendEl.style.display = "none";
+  if (barsEl) barsEl.style.display = "none";
+  if (titleEl) titleEl.textContent = `Predicted spend — ${MONTH_LABELS[m] || m}`;
+  if (descEl) descEl.textContent = `Average monthly invoice expected for ${MONTH_LABELS[m] || m}, based on the average of the last ${p.histCount} billed month${p.histCount===1?"":"s"} (${histLabel}). This is a forecast, not billed data.`;
+  if (singleEl) {
+    singleEl.style.display = "";
+    singleEl.innerHTML = `<div class="empty-state">This is a prediction based on recent months — no bills or campaigns exist yet for ${MONTH_LABELS[m] || m}.</div>`;
+  }
+
+  const tableEl = document.getElementById("compareTable");
+  if (tableEl) tableEl.innerHTML = `<div class="empty-state">Prediction only — the detailed table appears once real data is added for ${MONTH_LABELS[m] || m}.</div>`;
+
+  const detailSec = document.getElementById("compareDetailSection");
+  if (detailSec) detailSec.style.display = "none";
 }
 
 function renderCompare() {
@@ -964,6 +1038,9 @@ function renderCompare() {
   populateCompareRangeSelects();
   renderCompareMonthButtons();
   const months = monthsInRange();
+
+  const isPredicted = months.length === 1 && !allMonths.includes(months[0]);
+  if (isPredicted) { renderComparePredicted(months[0]); return; }
   document.getElementById("compareRangeLabel").textContent = months.length
     ? `${MONTH_LABELS[months[0]]} – ${MONTH_LABELS[months[months.length-1]]} (${months.length} month${months.length===1?"":"s"})`
     : "No months in range";
