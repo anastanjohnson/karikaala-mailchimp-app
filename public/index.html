@@ -131,7 +131,7 @@
     <section id="opentableMonthDetailSection">
       <h2 id="opentableMonthDetailTitle">Month detail</h2>
       <p class="desc">The OpenTable invoice for the selected month, compared to the previous month's invoice.</p>
-      <div class="kpi-row" id="opentableMonthDetailKpis" style="grid-template-columns: repeat(3,1fr);"></div>
+      <div class="kpi-row" id="opentableMonthDetailKpis" style="grid-template-columns: repeat(4,1fr);"></div>
     </section>
 
     <section>
@@ -578,10 +578,14 @@ function renderOpentableMonthDetail() {
     changeExtra = `<div class="delta">No invoice yet</div>`;
   }
 
+  const covers = (OPENTABLE_COVERS[opentableMonth] || {}).covers || 0;
+  const perGuest = (curr != null && covers > 0) ? curr / covers : null;
+
   kpisEl.innerHTML = kpiHtml([
     [prevM ? `${MONTH_LABELS[prevM]} invoice` : "Previous month invoice", prev != null ? eur(prev) : "—", "", false],
     [`${MONTH_LABELS[opentableMonth]} invoice`, curr != null ? eur(curr) : "—", "", true],
     ["Change vs. previous month", changeValue, changeExtra, false],
+    ["Spend per guest", perGuest != null ? eur(perGuest) : "—", `<div class="delta">${eur(curr||0)} / ${fmt(covers)} covers</div>`, false],
   ]);
 }
 
