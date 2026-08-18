@@ -121,20 +121,28 @@
 
   <!-- Opentable view -->
   <div id="opentableView" style="display:none;">
+    <div class="controls full-row" id="opentableMonthButtons" style="margin-bottom:14px;"></div>
+
     <div class="kpi-group kpi-group-spend">
       <div class="kpi-group-heading"><span class="kpi-group-dot"></span>OpenTable</div>
       <div class="kpi-row" id="opentableKpiRow" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));"></div>
     </div>
 
+    <section id="opentableMonthDetailSection">
+      <h2 id="opentableMonthDetailTitle">Month detail</h2>
+      <p class="desc">The OpenTable invoice for the selected month, compared to the previous month's invoice.</p>
+      <div class="kpi-row" id="opentableMonthDetailKpis" style="grid-template-columns: repeat(3,1fr);"></div>
+    </section>
+
     <section>
       <h2>Monthly OpenTable expense</h2>
-      <p class="desc">OpenTable subscription/billing invoice total for each month of 2026, pulled from OpenTable's billing history. Months without a bar yet don't have an invoice available.</p>
+      <p class="desc">OpenTable subscription/billing invoice total for each month of 2026, pulled from OpenTable's billing history. Months without a bar yet don't have an invoice available. Click a bar or a month button above to see that month's change vs. the previous month.</p>
       <div class="month-bars" id="opentableExpenseBars"></div>
     </section>
 
     <section>
       <h2>Monthly summary — expenses, experiences &amp; covers</h2>
-      <p class="desc">Expense is the OpenTable invoice total for the month. Active experiences lists what was live during that month. Covers by source is pulled from the Reservations report for that month's Visit Date range.</p>
+      <p class="desc">Expense is the OpenTable invoice total for the month, with the change vs. the previous month. Active experiences lists what was live during that month. Covers by source is pulled from the Reservations report for that month's Visit Date range.</p>
       <div id="opentableTable"></div>
     </section>
   </div>
@@ -154,6 +162,7 @@ const MONTH_LABELS = {};
 let channel = "mailchimp";
 let currentMonth = { mailchimp: null, meta: null };
 let currentView = "chart";
+let opentableMonth = null;
 
 // Additional marketing vendors not tied to Mailchimp/Meta. Each vendor has a per-month
 // spend map.
@@ -498,13 +507,94 @@ function setChannel(ch) {
   }
 }
 
+function opentableMonths() {
+  return Object.keys(OPENTABLE_COVERS).sort();
+}
+
+function opentableInvoiceDeltaHtml(m) {
+  const months = opentableMonths();
+  const idx = months.indexOf(m);
+  const prevM = idx > 0 ? months[idx - 1] : null;
+  const curr = OPENTABLE_INVOICES[m];
+  const prev = prevM ? OPENTABLE_INVOICES[prevM] : null;
+  if (curr == null || prev == null) return "";
+  return deltaHtml(curr, prev, MONTH_LABELS[prevM] || prevM, true);
+}
+
+function selectOpentableMonth(m) {
+  opentableMonth = (opentableMonth === m) ? null : m;
+  renderOpentable();
+}
+
+function renderOpentableMonthButtons() {
+  const el = document.getElementById("opentableMonthButtons");
+  if (!el) return;
+  const months = opentableMonths();
+  const names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const year = months.length ? months[0].split("-")[0] : "2026";
+  el.innerHTML = names.map((name, i) => {
+    const m = `${year}-${String(i + 1).padStart(2, "0")}`;
+    const hasData = months.includes(m);
+    const active = opentableMonth === m;
+    const cls = ["toggle-btn"];
+    if (active) cls.push("active");
+    if (!hasData) cls.push("disabled");
+    return `<button type="button" class="${cls.join(' ')}" ${hasData ? `onclick="selectOpentableMonth('${m}')"` : "disabled"}>${name}</button>`;
+  }).join("");
+}
+
+function renderOpentableMonthDetail() {
+  const section = document.getElementById("opentableMonthDetailSection");
+  const titleEl = document.getElementById("opentableMonthDetailTitle");
+  const kpisEl = document.getElementById("opentableMonthDetailKpis");
+  if (!section || !kpisEl) return;
+  if (!opentableMonth) { section.style.display = "none"; return; }
+  section.style.display = "";
+
+  const months = opentableMonths();
+  const idx = months.indexOf(opentableMonth);
+  const prevM = idx > 0 ? months[idx - 1] : null;
+  const curr = OPENTABLE_INVOICES[opentableMonth];
+  const prev = prevM ? OPENTABLE_INVOICES[prevM] : null;
+
+  titleEl.textContent = `Month detail — ${MONTH_LABELS[opentableMonth] || opentableMonth}`;
+
+  const kpiHtml = pairs => pairs.map(([label,value,extra,highlight]) => `
+    <div class="kpi${highlight ? ' kpi-highlight' : ''}"><div class="label">${label}</div><div class="value">${value}</div>${extra || ""}</div>
+  `).join("");
+
+  let changeValue = "—", changeExtra = "";
+  if (curr != null && prev != null) {
+    const diff = curr - prev;
+    const pct = prev ? (diff / prev * 100) : 0;
+    const sign = diff >= 0 ? "+" : "";
+    changeValue = `${sign}${eur(diff)}`;
+    changeExtra = `<div class="delta ${diff <= 0 ? 'up' : 'down'}">${sign}${pct.toFixed(0)}%</div>`;
+  } else if (curr != null && !prevM) {
+    changeValue = "—";
+    changeExtra = `<div class="delta">First billed month</div>`;
+  } else if (curr == null) {
+    changeValue = "—";
+    changeExtra = `<div class="delta">No invoice yet</div>`;
+  }
+
+  kpisEl.innerHTML = kpiHtml([
+    [prevM ? `${MONTH_LABELS[prevM]} invoice` : "Previous month invoice", prev != null ? eur(prev) : "—", "", false],
+    [`${MONTH_LABELS[opentableMonth]} invoice`, curr != null ? eur(curr) : "—", "", true],
+    ["Change vs. previous month", changeValue, changeExtra, false],
+  ]);
+}
+
 function renderOpentable() {
-  const months = Object.keys(OPENTABLE_COVERS).sort();
+  const months = opentableMonths();
   const totalExpense = months.reduce((s, m) => s + (OPENTABLE_INVOICES[m] || 0), 0);
   const billedMonths = months.filter(m => OPENTABLE_INVOICES[m] != null);
   const avgExpense = billedMonths.length ? totalExpense / billedMonths.length : 0;
   const totalCovers = months.reduce((s, m) => s + (OPENTABLE_COVERS[m].covers || 0), 0);
   const totalOtNetwork = months.reduce((s, m) => s + (OPENTABLE_COVERS[m].opentableNetwork || 0), 0);
+
+  renderOpentableMonthButtons();
+  renderOpentableMonthDetail();
 
   const kpiHtml = pairs => pairs.map(([label,value,highlight]) => `
     <div class="kpi${highlight ? ' kpi-highlight' : ''}"><div class="label">${label}</div><div class="value">${value}</div></div>
@@ -522,11 +612,12 @@ function renderOpentable() {
   barsEl.innerHTML = months.map((m, i) => {
     const has = OPENTABLE_INVOICES[m] != null;
     const h = has ? Math.max((vals[i]/max*100), 2) : 2;
+    const isSel = m === opentableMonth;
     return `
-    <div class="month-col">
+    <div class="month-col" style="cursor:pointer;" onclick="selectOpentableMonth('${m}')">
       <div class="month-val">${has ? eur(vals[i]) : "—"}</div>
       <div class="month-bar-wrap">
-        <div class="month-bar ${has ? '' : ''}" style="height:${h}%; opacity:${has ? 1 : 0.25};" data-tip="${MONTH_LABELS[m] || m} · ${has ? eur(vals[i]) : 'No invoice yet'}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
+        <div class="month-bar ${isSel ? 'selected' : ''}" style="height:${h}%; opacity:${has ? 1 : 0.25};" data-tip="${MONTH_LABELS[m] || m} · ${has ? eur(vals[i]) : 'No invoice yet'}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
       </div>
       <div class="month-lbl">${MONTH_LABELS[m] || m}</div>
     </div>`;
@@ -536,10 +627,12 @@ function renderOpentable() {
     const c = OPENTABLE_COVERS[m];
     const exp = OPENTABLE_INVOICES[m];
     const exps = (OPENTABLE_EXPERIENCES[m] || []);
+    const isSel = m === opentableMonth;
     return `
-    <tr>
+    <tr class="compare-row ${isSel ? 'selected-row' : ''}" style="cursor:pointer;" onclick="selectOpentableMonth('${m}')">
       <td>${MONTH_LABELS[m] || m}${c.partial ? ` <span style="color:var(--text-muted); font-size:11px;">(${c.partial})</span>` : ""}</td>
       <td class="num">${exp != null ? eur(exp) : "—"}</td>
+      <td class="num">${opentableInvoiceDeltaHtml(m) || "—"}</td>
       <td>${exps.length ? exps.join("<br>") : "—"}</td>
       <td class="num">${fmt(c.covers)}</td>
       <td class="num">${fmt(c.reservations)}</td>
@@ -553,7 +646,7 @@ function renderOpentable() {
   document.getElementById("opentableTable").innerHTML = `
     <div style="overflow-x:auto;">
     <table><thead><tr>
-      <th>Month</th><th class="num">Expense</th><th>Active experiences</th>
+      <th>Month</th><th class="num">Expense</th><th class="num">vs. last month</th><th>Active experiences</th>
       <th class="num">Covers</th><th class="num">Reservations</th>
       <th class="num">OpenTable Network</th><th class="num">Your Network</th><th class="num">Other Networks</th>
       <th class="num">Phone/In-house</th><th class="num">Walk-in</th>
