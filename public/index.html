@@ -889,15 +889,21 @@ let compareRange = { from: null, to: null };
 function populateCompareRangeSelects() {
   const months = allMonthsUnion();
   if (!months.length) return;
-  if (!compareRange.from || !months.includes(compareRange.from)) compareRange.from = months[0];
-  if (!compareRange.to || !months.includes(compareRange.to)) compareRange.to = months[months.length - 1];
+  // Only fall back to defaults when nothing has been picked yet. A single predicted
+  // month (Sep–Dec, chosen via the month buttons) is valid even though it's outside
+  // `months` (real billed/logged data) — don't clobber it here.
+  const isPredictedSingle = compareRange.from && compareRange.from === compareRange.to && !months.includes(compareRange.from);
+  if (!isPredictedSingle) {
+    if (!compareRange.from || !months.includes(compareRange.from)) compareRange.from = months[0];
+    if (!compareRange.to || !months.includes(compareRange.to)) compareRange.to = months[months.length - 1];
+  }
   const opts = months.map(m => `<option value="${m}">${MONTH_LABELS[m]}</option>`).join("");
   const fromSel = document.getElementById("compareFrom");
   const toSel = document.getElementById("compareTo");
   fromSel.innerHTML = opts;
   toSel.innerHTML = opts;
-  fromSel.value = compareRange.from;
-  toSel.value = compareRange.to;
+  fromSel.value = isPredictedSingle ? "" : compareRange.from;
+  toSel.value = isPredictedSingle ? "" : compareRange.to;
 }
 
 function onCompareRangeChange() {
