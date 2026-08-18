@@ -803,25 +803,30 @@ function renderOpentableExperienceGuests() {
   const el = document.getElementById("opentableExperienceGuests");
   if (!el) return;
   const months = opentableMonths();
-  const rows = months.map(m => {
+  const rows = [];
+  months.forEach(m => {
     const exps = OPENTABLE_EXPERIENCES[m] || [];
     const g = experienceGuestsForMonth(m);
     const isSel = m === opentableMonth;
-    return `
-    <tr class="compare-row ${isSel ? 'selected-row' : ''}" style="cursor:pointer;" onclick="selectOpentableMonth('${m}')">
-      <td>${MONTH_LABELS[m] || m}</td>
-      <td>${exps.length ? exps.join("<br>") : "—"}</td>
-      <td class="num">${g ? fmt(g.website) : "—"}</td>
-      <td class="num">${g ? fmt(g.dinerNetwork) : "—"}</td>
-      <td class="num" style="font-weight:600;">${g ? fmt(g.total) : "—"}</td>
-    </tr>`;
-  }).join("");
+    const list = exps.length ? exps : ["—"];
+    list.forEach((exp, i) => {
+      rows.push(`
+      <tr class="compare-row ${isSel ? 'selected-row' : ''}" style="cursor:pointer;" onclick="selectOpentableMonth('${m}')">
+        <td>${i === 0 ? (MONTH_LABELS[m] || m) : ""}</td>
+        <td>${exp}</td>
+        <td class="num">${g ? fmt(g.website) : "—"}</td>
+        <td class="num">${g ? fmt(g.dinerNetwork) : "—"}</td>
+        <td class="num" style="font-weight:600;">${g ? fmt(g.total) : "—"}</td>
+      </tr>`);
+    });
+  });
   el.innerHTML = `
+    <p class="desc" style="margin-top:-4px; margin-bottom:10px;">OpenTable's invoice reports guests seated per booking source (Website / Diner Network) for the month as a whole, not split out per Experience — so when more than one Experience is active in the same month, each gets its own row here but shares that month's totals.</p>
     <div style="overflow-x:auto;">
     <table><thead><tr>
-      <th>Month</th><th>Active experience(s)</th>
+      <th>Month</th><th>Experience</th>
       <th class="num">Guests — Website booked</th><th class="num">Guests — Diner Network</th><th class="num">Total guests seated</th>
-    </tr></thead><tbody>${rows}</tbody></table>
+    </tr></thead><tbody>${rows.join("")}</tbody></table>
     </div>`;
 }
 
