@@ -1,41 +1,49 @@
 :root, .viz-root {
   color-scheme: light;
-  --surface-0: #f5f6f4;
-  --surface-1: #fcfcfb;
-  --surface-2: #ffffff;
-  --border: #e3e2dc;
+  --surface-0: #f9f9f7;
+  --surface-1: #ffffff;
+  --surface-2: #fcfcfb;
+  --surface-hover: #f1f1ef;
+  --border: rgba(11, 11, 11, 0.1);
   --text-primary: #0b0b0b;
   --text-secondary: #52514e;
-  --text-muted: #83817a;
-  --series-1: #eb6834;
-  --series-1-soft: #eb68341a;
-  --series-2: #2a78d6;
-  --series-2-soft: #2a78d61a;
-  --status-good: #1baf7a;
+  --text-muted: #898781;
+  --series-1: #4a3aa7;
+  --series-1-soft: #4a3aa71a;
+  --series-2: #1baf7a;
+  --series-2-soft: #1baf7a1a;
+  --status-good: #006300;
   --status-warning: #eda100;
-  --status-critical: #e34948;
+  --status-critical: #d03b3b;
+  --accent: #4a3aa7;
+  --accent-contrast: #ffffff;
+  --shadow: 0 1px 2px rgba(11, 11, 11, 0.04), 0 8px 24px rgba(11, 11, 11, 0.06);
 }
 :root[data-theme="dark"], [data-theme="dark"] .viz-root {
   color-scheme: dark;
-  --surface-0: #121211;
-  --surface-1: #1a1a19;
-  --surface-2: #202020;
-  --border: #322f2b;
+  --surface-0: #0d0d0d;
+  --surface-1: #17171a;
+  --surface-2: #1a1a19;
+  --surface-hover: #232326;
+  --border: rgba(255, 255, 255, 0.1);
   --text-primary: #ffffff;
   --text-secondary: #c3c2b7;
-  --text-muted: #8f8d84;
-  --series-1: #d95926;
-  --series-1-soft: #d9592633;
-  --series-2: #3987e5;
-  --series-2-soft: #3987e533;
-  --status-good: #199e70;
+  --text-muted: #898781;
+  --series-1: #9085e9;
+  --series-1-soft: #9085e933;
+  --series-2: #199e70;
+  --series-2-soft: #199e7033;
+  --status-good: #0ca30c;
   --status-warning: #c98500;
   --status-critical: #e66767;
+  --accent: #9085e9;
+  --accent-contrast: #0b0b0b;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   background: var(--surface-0);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
@@ -69,13 +77,13 @@ select, .toggle-btn, input, button {
 .kpi-highlight { background: var(--kpi-accent-soft, var(--series-1-soft)) !important; border: 1.5px solid var(--kpi-accent, var(--series-1)) !important; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .kpi-highlight .label { color: var(--kpi-accent, var(--series-1)); font-weight: 700; }
 .kpi-highlight .value { color: var(--kpi-accent, var(--series-1)); }
-.kpi { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+.kpi { background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; box-shadow: var(--shadow); }
 .kpi .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
 .kpi .value { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
 .kpi .delta { font-size: 12px; margin-top: 4px; }
 .kpi .delta.up { color: var(--status-good); }
 .kpi .delta.down { color: var(--status-critical); }
-section { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+section { background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
 section h2 { font-size: 15px; margin: 0 0 2px; }
 section .desc { font-size: 12px; color: var(--text-muted); margin: 0 0 16px; }
 .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; position: relative; }
@@ -115,9 +123,9 @@ form.admin-form input, form.admin-form select { width: 100%; }
 .row-actions { display: flex; gap: 6px; }
 .row-actions button { padding: 4px 8px; font-size: 11px; }
 .danger { color: var(--status-critical); border-color: var(--status-critical); }
-.login-box { max-width: 340px; margin: 80px auto; background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 28px; text-align: center; }
+.login-box { max-width: 340px; margin: 80px auto; background: var(--surface-1); border: 1px solid var(--border); border-radius: 18px; padding: 28px; text-align: center; box-shadow: var(--shadow); }
 .login-box input { width: 100%; margin-bottom: 12px; }
-.login-box button { width: 100%; background: var(--series-1); color: white; border: none; font-weight: 600; padding: 10px; }
+.login-box button { width: 100%; background: var(--accent); color: var(--accent-contrast); border: none; font-weight: 700; padding: 10px; border-radius: 9px; }
 .error-msg { color: var(--status-critical); font-size: 12px; margin-top: 8px; }
 .legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
 .legend-item { display: flex; align-items: center; gap: 6px; }

@@ -16,6 +16,7 @@
     <div class="controls">
       <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()">Dark mode</button>
       <a class="toggle-btn" href="/admin" style="text-decoration:none;">Admin</a>
+      <button class="toggle-btn" onclick="siteLogout()">Log out</button>
     </div>
   </header>
 
@@ -829,29 +830,29 @@ function renderOpentableExperienceGuests() {
   const m = opentableMonth;
 
   if (!m) {
-    // All time — show every month's experiences together.
+    // All time — show every month's experiences as a bar chart.
     const months = opentableMonths();
-    const rows = [];
+    const entries = [];
     months.forEach(mm => {
       const list = OPENTABLE_EXPERIENCE_COVERS[mm] || [];
-      const display = list.length ? list : [{ name: "—", covers: null }];
-      display.forEach((exp, i) => {
-        rows.push(`
-        <tr class="compare-row" style="cursor:pointer;" onclick="selectOpentableMonth('${mm}')">
-          <td>${i === 0 ? (MONTH_LABELS[mm] || mm) : ""}</td>
-          <td>${exp.name}</td>
-          <td class="num" style="font-weight:600;">${exp.covers != null ? fmt(exp.covers) : "—"}</td>
-        </tr>`);
-      });
+      list.forEach(exp => entries.push({ month: mm, name: exp.name, covers: exp.covers }));
     });
-    el.innerHTML = `
-      <p class="desc" style="margin-top:-4px; margin-bottom:10px;">Showing all months — click a month above (or a row) to see just that month.</p>
-      <div style="overflow-x:auto;">
-      <table><thead><tr>
-        <th>Month</th><th>Experience</th>
-        <th class="num">Covers (guests seated)</th>
-      </tr></thead><tbody>${rows.join("")}</tbody></table>
+    const max = Math.max(...entries.map(e => e.covers || 0), 1);
+    const bars = entries.map(e => {
+      const pct = Math.max((e.covers || 0) / max * 100, 2);
+      return `
+      <div class="bar-row">
+        <div class="bar-label" title="${e.name}">${MONTH_LABELS[e.month] || e.month} · ${e.name}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${pct}%;cursor:pointer;" data-tip="${MONTH_LABELS[e.month] || e.month} — ${e.name}: ${fmt(e.covers)} covers" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)" onclick="selectOpentableMonth('${e.month}')"></div>
+        </div>
+        <div class="bar-value">${fmt(e.covers)}</div>
       </div>`;
+    }).join("");
+    el.innerHTML = `
+      <p class="desc" style="margin-top:-4px; margin-bottom:10px;">Showing all months — click a bar (or a month above) to see just that month.</p>
+      ${bars || `<div class="empty-state">No experience data yet.</div>`}
+    `;
     return;
   }
 
@@ -950,6 +951,11 @@ function toggleTheme() {
   const isDark = root.getAttribute("data-theme") === "dark";
   root.setAttribute("data-theme", isDark ? "light" : "dark");
   document.getElementById("themeToggle").textContent = isDark ? "Dark mode" : "Light mode";
+}
+
+async function siteLogout() {
+  await fetch("/api/site-logout", { method: "POST" });
+  location.href = "/login.html";
 }
 
 function render() {
