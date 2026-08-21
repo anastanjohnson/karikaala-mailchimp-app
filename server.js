@@ -1,5 +1,7 @@
 const express = require("express");
 const session = require("express-session");
+const rateLimit = require("express-rate-limit");
+const crypto = require("crypto");
 const path = require("path");
 const db = require("./db");
 
@@ -8,18 +10,96 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "changeme";
 const SESSION_SECRET = process.env.SESSION_SECRET || "dev-secret-change-in-production";
 
+// Site-wide login — gates the entire dashboard (not just /admin editing).
+const DASHBOARD_USERNAME = process.env.DASHBOARD_USERNAME || "karikaala";
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || "changeme";
+if (!process.env.DASHBOARD_PASSWORD) {
+  console.warn("WARNING: DASHBOARD_PASSWORD not set — using an insecure default. Set it in your environment.");
+}
+
 db.ensureDataFile();
 
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
 app.use(express.json());
 app.use(
   session({
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 },
+    cookie: { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" },
   })
 );
-app.use(express.static(path.join(__dirname, "public")));
+
+function timingSafeStringEqual(a, b) {
+  const bufA = Buffer.from(String(a));
+  const bufB = Buffer.from(String(b));
+  if (bufA.length !== bufB.length) {
+    // still run a comparison of equal length to avoid leaking length via timing
+    crypto.timingSafeEqual(bufA, bufA);
+    return false;
+  }
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+const siteLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many login attempts. Please try again later." },
+});
+
+// --- Site-wide auth (protects viewing the whole dashboard) ---
+function requireSiteAuthPage(req, res, next) {
+  if (req.session && req.session.siteAuth) return next();
+  const next_ = encodeURIComponent(req.originalUrl || "/");
+  return res.redirect(`/login.html?next=${next_}`);
+}
+
+function requireSiteAuthApi(req, res, next) {
+  if (req.session && req.session.siteAuth) {
+    res.set("Cache-Control", "no-store");
+    return next();
+  }
+  return res.status(401).json({ error: "Authentication required" });
+}
+
+app.post("/api/site-login", siteLoginLimiter, (req, res) => {
+  const { username, password } = req.body || {};
+  const usernameOk = timingSafeStringEqual(String(username || "").toLowerCase(), DASHBOARD_USERNAME.toLowerCase());
+  const passwordOk = timingSafeStringEqual(String(password || ""), DASHBOARD_PASSWORD);
+  if (!usernameOk || !passwordOk) {
+    return res.status(401).json({ error: "Incorrect username or password." });
+  }
+  req.session.siteAuth = true;
+  res.json({ authenticated: true });
+});
+
+app.post("/api/site-logout", (req, res) => {
+  req.session.siteAuth = false;
+  res.json({ authenticated: false });
+});
+
+app.get("/api/site-session", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json({ authenticated: !!(req.session && req.session.siteAuth) });
+});
+
+// Assets that must stay reachable while signed out (login page + shared CSS — no restaurant data in either).
+app.get("/login.html", (req, res) => res.sendFile(path.join(__dirname, "public", "login.html")));
+app.get("/style.css", (req, res) => res.sendFile(path.join(__dirname, "public", "style.css")));
+
+// Everything else that serves a page requires a signed-in session first.
+app.get(["/", "/index.html"], requireSiteAuthPage, (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// All other /api/* data routes require the site-wide session too.
+app.use("/api", (req, res, next) => {
+  if (req.path === "/site-login" || req.path === "/site-session" || req.path === "/site-logout") return next();
+  return requireSiteAuthApi(req, res, next);
+});
 
 function requireAuth(req, res, next) {
   if (req.session && req.session.loggedIn) return next();
@@ -143,7 +223,7 @@ app.delete("/api/:channel/months/:month/items/:index", validChannel, requireAuth
   res.json({ ok: true });
 });
 
-app.get("/admin", (req, res) => {
+app.get("/admin", requireSiteAuthPage, (req, res) => {
   res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 
