@@ -185,6 +185,12 @@
       <div class="month-bars" id="opentableExpenseBars"></div>
     </section>
 
+    <section id="opentableCostPerCoverSection">
+      <h2>Cost per cover</h2>
+      <p class="desc">OpenTable invoice total for the month, divided by total covers (guests seated) that month. Months without a billed invoice or with zero covers aren't shown.</p>
+      <div class="month-bars" id="opentableCostPerCoverBars"></div>
+    </section>
+
     <section>
       <h2>Active experiences — guests seated</h2>
       <p class="desc">Each active OpenTable Experience and its real Covers (guests seated) for that month, pulled directly from OpenTable Guest Center's Experiences report. August 2026 covers 1–18 Aug (month in progress).</p>
@@ -966,6 +972,32 @@ function renderOpentable() {
       <div class="month-lbl">${MONTH_LABELS[m] || m}</div>
     </div>`;
   }).join("");
+
+  const cpcSection = document.getElementById("opentableCostPerCoverSection");
+  if (cpcSection) cpcSection.style.display = opentableMonth ? "none" : "";
+  const cpcBarsEl = document.getElementById("opentableCostPerCoverBars");
+  if (cpcBarsEl) {
+    const cpcVals = months.map(m => {
+      const inv = OPENTABLE_INVOICES[m];
+      const cov = (OPENTABLE_COVERS[m] || {}).covers || 0;
+      return (inv != null && cov > 0) ? inv / cov : null;
+    });
+    const cpcMax = Math.max(...cpcVals.filter(v => v != null), 1);
+    cpcBarsEl.innerHTML = months.map((m, i) => {
+      const v = cpcVals[i];
+      const has = v != null;
+      const h = has ? Math.max((v/cpcMax*100), 2) : 2;
+      const isSel = m === opentableMonth;
+      return `
+      <div class="month-col" style="cursor:pointer;" onclick="selectOpentableMonth('${m}')">
+        <div class="month-val">${has ? eur(v) : "—"}</div>
+        <div class="month-bar-wrap">
+          <div class="month-bar ${isSel ? 'selected' : ''}" style="height:${h}%; opacity:${has ? 1 : 0.25};" data-tip="${MONTH_LABELS[m] || m} · ${has ? eur(v) + ' per cover' : 'No data'}" onmousemove="showTip(event,this)" onmouseleave="hideTip(this)"></div>
+        </div>
+        <div class="month-lbl">${MONTH_LABELS[m] || m}</div>
+      </div>`;
+    }).join("");
+  }
 
   const rows = months.map(m => {
     const c = OPENTABLE_COVERS[m];
