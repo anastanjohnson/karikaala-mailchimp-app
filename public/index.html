@@ -5,6 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Marketing Dashboard — KARIKAALA</title>
 <link rel="stylesheet" href="/style.css">
+<style>
+.website-view .website-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px}
+.website-view .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--series-3);font-weight:750}
+.website-view .open-site{display:inline-block;color:#fff;background:var(--series-3);text-decoration:none;padding:9px 14px;border-radius:8px;font-size:12px;font-weight:700}
+.website-view .ga-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.website-view .ga-layout{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}
+.website-view .ga-card{background:var(--surface-1);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+.website-view .ga-kpi{background:var(--surface-1);border:1px solid var(--border);border-radius:12px;padding:16px}
+.website-view .ga-label{font-size:11px;color:var(--text-muted);margin-bottom:5px}
+.website-view .ga-value{font-size:24px;font-weight:750}
+.website-view .ga-bar-row{display:grid;grid-template-columns:125px 1fr 70px;gap:10px;align-items:center;margin:12px 0;font-size:12px}
+.website-view .ga-bar-track{height:12px;background:var(--grid);border-radius:6px;overflow:hidden}
+.website-view .ga-bar-fill{height:100%;background:var(--series-3);border-radius:6px}
+.website-view .ga-table-wrap{overflow:auto}
+.website-view table{width:100%;border-collapse:collapse;font-size:12px}
+.website-view th,.website-view td{padding:9px 8px;border-bottom:1px solid var(--grid);text-align:left}
+.website-view th{font-size:10px;text-transform:uppercase;color:var(--text-muted)}
+.website-view .source-note{margin:0 0 16px;color:var(--text-muted);font-size:12px}
+@media(max-width:860px){.website-view .ga-grid{grid-template-columns:repeat(2,1fr)}.website-view .ga-layout{grid-template-columns:1fr}}
+@media(max-width:520px){.website-view .ga-grid{grid-template-columns:1fr}.website-view .ga-bar-row{grid-template-columns:100px 1fr 55px}}
+</style>
 </head>
 <body>
 <div class="app-shell viz-root">
@@ -30,6 +51,10 @@
       <button class="sidebar__item" id="tabOpentable" onclick="setChannel('opentable')">
         <svg class="sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
         Opentable
+      </button>
+      <button class="sidebar__item" id="tabWebsite" onclick="setChannel('website')">
+        <svg class="sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/></svg>
+        Website Visits
       </button>
     </nav>
     <div class="sidebar__section-label">Manage</div>
@@ -62,7 +87,7 @@
     <div class="dashboard__header">
       <div>
         <h1>Marketing Dashboard — KARIKAALA</h1>
-        <p class="sub">Meta Ads + Mailchimp, one place for all channels · Source: live backend</p>
+        <p class="sub">Meta Ads + Mailchimp + OpenTable + Google Analytics 4 · One place for all marketing channels</p>
       </div>
     </div>
 
@@ -208,6 +233,42 @@
     </div>
   </div>
 </div>
+
+  <div id="websiteView" class="website-view" style="display:none;">
+    <div class="website-head">
+      <div><span class="eyebrow">Google Analytics 4</span><h1>Website Visits</h1><p class="sub">Monthly traffic for the KARIKAALA website and acquisition-channel performance.</p></div>
+      <a class="open-site" href="https://karikaala-mailchimp-app.onrender.com/" target="_blank" rel="noreferrer">Open Website</a>
+    </div>
+    <p class="source-note"><strong>August 2026 month-to-date.</strong> Manual GA4 snapshot covering 1–24 August 2026.</p>
+    <div class="ga-grid">
+      <div class="ga-kpi"><div class="ga-label">Sessions</div><div class="ga-value">7,430</div><div class="ga-label">All acquisition channels</div></div>
+      <div class="ga-kpi"><div class="ga-label">Engaged sessions</div><div class="ga-value">7,320</div><div class="ga-label">98.5% engagement rate</div></div>
+      <div class="ga-kpi"><div class="ga-label">Average engagement</div><div class="ga-value">28 sec</div><div class="ga-label">Average per session</div></div>
+      <div class="ga-kpi"><div class="ga-label">Key events</div><div class="ga-value">17,019</div><div class="ga-label">38,026 total events</div></div>
+    </div>
+    <div class="ga-layout">
+      <section class="ga-card"><h2>Sessions by channel</h2>
+        <div class="ga-bar-row"><span>Email</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:100%"></div></div><strong>3,185</strong></div>
+        <div class="ga-bar-row"><span>Organic Search</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:48.1%"></div></div><strong>1,531</strong></div>
+        <div class="ga-bar-row"><span>Direct</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:37%"></div></div><strong>1,179</strong></div>
+        <div class="ga-bar-row"><span>Organic Social</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:32.9%"></div></div><strong>1,049</strong></div>
+        <div class="ga-bar-row"><span>Unassigned</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:9.6%"></div></div><strong>305</strong></div>
+        <div class="ga-bar-row"><span>Referral</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:2.4%"></div></div><strong>76</strong></div>
+        <div class="ga-bar-row"><span>AI Assistant</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:.5%"></div></div><strong>15</strong></div>
+      </section>
+      <section class="ga-card ga-table-wrap"><h2>Channel performance</h2>
+        <table><thead><tr><th>Channel</th><th>Share</th><th>Engagement</th><th>Avg.</th></tr></thead><tbody>
+          <tr><td>Email</td><td>42.9%</td><td>100.0%</td><td>2 sec</td></tr>
+          <tr><td>Organic Search</td><td>20.6%</td><td>96.7%</td><td>73 sec</td></tr>
+          <tr><td>Direct</td><td>15.9%</td><td>97.5%</td><td>43 sec</td></tr>
+          <tr><td>Organic Social</td><td>14.1%</td><td>99.5%</td><td>16 sec</td></tr>
+          <tr><td>Unassigned</td><td>4.1%</td><td>89.2%</td><td>48 sec</td></tr>
+          <tr><td>Referral</td><td>1.0%</td><td>96.1%</td><td>71 sec</td></tr>
+          <tr><td>AI Assistant</td><td>0.2%</td><td>86.7%</td><td>98 sec</td></tr>
+        </tbody></table>
+      </section>
+    </div>
+  </div>
 
 <script>
 const CHANNEL_META = {
@@ -704,10 +765,14 @@ function setChannel(ch) {
   document.getElementById("tabMeta").classList.toggle("ch-meta", ch === "meta");
   document.getElementById("tabCompare").classList.toggle("active", ch === "compare");
   document.getElementById("tabOpentable").classList.toggle("active", ch === "opentable");
+  document.getElementById("tabWebsite").classList.toggle("active", ch === "website");
   document.getElementById("singleView").style.display = (ch === "mailchimp" || ch === "meta") ? "" : "none";
   document.getElementById("compareView").style.display = ch === "compare" ? "" : "none";
   document.getElementById("opentableView").style.display = ch === "opentable" ? "" : "none";
-  if (ch === "opentable") {
+  document.getElementById("websiteView").style.display = ch === "website" ? "" : "none";
+  if (ch === "website") {
+    return;
+  } else if (ch === "opentable") {
     renderOpentable();
   } else if (ch !== "compare") {
     populateSingleMonthButtons();
