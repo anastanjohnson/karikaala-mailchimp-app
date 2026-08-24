@@ -7,25 +7,64 @@
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<div class="viz-root wrap">
-  <header>
-    <div>
-      <h1>Marketing Dashboard — KARIKAALA</h1>
-      <p class="sub">Meta Ads + Mailchimp, one place for all channels · Source: live backend</p>
+<div class="app-shell viz-root">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+      <span class="sidebar__brand-mark">K</span>
+      <span class="sidebar__brand-name">KARIKAALA</span>
     </div>
-    <div class="controls">
-      <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()">Dark mode</button>
-      <a class="toggle-btn" href="/admin" style="text-decoration:none;">Admin</a>
-      <button class="toggle-btn" onclick="siteLogout()">Log out</button>
-    </div>
-  </header>
+    <div class="sidebar__section-label">Channels</div>
+    <nav class="sidebar__nav">
+      <button class="sidebar__item active" id="tabCompare" onclick="setChannel('compare')">
+        <svg class="sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Compare channels
+      </button>
+      <button class="sidebar__item" id="tabMailchimp" onclick="setChannel('mailchimp')">
+        <svg class="sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        Mailchimp
+      </button>
+      <button class="sidebar__item" id="tabMeta" onclick="setChannel('meta')">
+        <svg class="sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18l6-7 4 4 8-9"/><path d="M15 6h6v6"/></svg>
+        Meta Ads
+      </button>
+      <button class="sidebar__item" id="tabOpentable" onclick="setChannel('opentable')">
+        <svg class="sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        Opentable
+      </button>
+    </nav>
+    <div class="sidebar__section-label">Manage</div>
+    <nav class="sidebar__nav">
+      <a class="sidebar__item" href="/admin">
+        <svg class="sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Admin
+      </a>
+    </nav>
+  </aside>
 
-  <div class="channel-tabs full-row">
-    <button class="toggle-btn active" id="tabCompare" onclick="setChannel('compare')">Compare channels</button>
-    <button class="toggle-btn" id="tabMailchimp" onclick="setChannel('mailchimp')">Mailchimp</button>
-    <button class="toggle-btn" id="tabMeta" onclick="setChannel('meta')">Meta Ads</button>
-    <button class="toggle-btn" id="tabOpentable" onclick="setChannel('opentable')">Opentable</button>
-  </div>
+  <div class="app-main">
+    <header class="topbar">
+      <div class="topbar__search">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" placeholder="Search…" disabled>
+      </div>
+      <div class="topbar__actions">
+        <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+          <svg id="themeIconSun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg id="themeIconMoon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z"/></svg>
+        </button>
+        <button class="icon-btn" onclick="siteLogout()" title="Log out" aria-label="Log out">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="app-content">
+    <div class="dashboard__header">
+      <div>
+        <h1>Marketing Dashboard — KARIKAALA</h1>
+        <p class="sub">Meta Ads + Mailchimp, one place for all channels · Source: live backend</p>
+      </div>
+    </div>
 
   <!-- Single-channel view -->
   <div id="singleView" style="display:none;">
@@ -160,6 +199,8 @@
   </div>
 
   <footer>Source: Meta Ads Manager + Mailchimp campaign reports. Data is served live from this site's backend — use the <a href="/admin">Admin</a> page to add new months.</footer>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -946,12 +987,23 @@ function renderOpentable() {
     </div>`;
 }
 
+function applyThemeIcons(isDark) {
+  const sun = document.getElementById("themeIconSun");
+  const moon = document.getElementById("themeIconMoon");
+  if (sun) sun.style.display = isDark ? "none" : "";
+  if (moon) moon.style.display = isDark ? "" : "none";
+}
+
 function toggleTheme() {
   const root = document.documentElement;
   const isDark = root.getAttribute("data-theme") === "dark";
   root.setAttribute("data-theme", isDark ? "light" : "dark");
-  document.getElementById("themeToggle").textContent = isDark ? "Dark mode" : "Light mode";
+  applyThemeIcons(!isDark);
 }
+
+// Dark theme by default, matching the reference dashboard.
+document.documentElement.setAttribute("data-theme", "dark");
+applyThemeIcons(true);
 
 async function siteLogout() {
   await fetch("/api/site-logout", { method: "POST" });
