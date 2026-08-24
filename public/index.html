@@ -6,25 +6,37 @@
 <title>Marketing Dashboard — KARIKAALA</title>
 <link rel="stylesheet" href="/style.css">
 <style>
-.website-view .website-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px}
-.website-view .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--series-3);font-weight:750}
-.website-view .open-site{display:inline-block;color:#fff;background:var(--series-3);text-decoration:none;padding:9px 14px;border-radius:8px;font-size:12px;font-weight:700}
-.website-view .ga-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-.website-view .ga-layout{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}
-.website-view .ga-card{background:var(--surface-1);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
-.website-view .ga-kpi{background:var(--surface-1);border:1px solid var(--border);border-radius:12px;padding:16px}
-.website-view .ga-label{font-size:11px;color:var(--text-muted);margin-bottom:5px}
-.website-view .ga-value{font-size:24px;font-weight:750}
-.website-view .ga-bar-row{display:grid;grid-template-columns:125px 1fr 70px;gap:10px;align-items:center;margin:12px 0;font-size:12px}
-.website-view .ga-bar-track{height:12px;background:var(--grid);border-radius:6px;overflow:hidden}
-.website-view .ga-bar-fill{height:100%;background:var(--series-3);border-radius:6px}
-.website-view .ga-table-wrap{overflow:auto}
-.website-view table{width:100%;border-collapse:collapse;font-size:12px}
-.website-view th,.website-view td{padding:9px 8px;border-bottom:1px solid var(--grid);text-align:left}
-.website-view th{font-size:10px;text-transform:uppercase;color:var(--text-muted)}
-.website-view .source-note{margin:0 0 16px;color:var(--text-muted);font-size:12px}
-@media(max-width:860px){.website-view .ga-grid{grid-template-columns:repeat(2,1fr)}.website-view .ga-layout{grid-template-columns:1fr}}
-@media(max-width:520px){.website-view .ga-grid{grid-template-columns:1fr}.website-view .ga-bar-row{grid-template-columns:100px 1fr 55px}}
+.website-view{--ga-bg:#0c0c0d;--ga-panel:#18181b;--ga-panel-2:#1b1b1d;--ga-border:#343438;--ga-text:#f7f7f8;--ga-muted:#9d9d9f;--ga-purple:#8b7de5;background:var(--ga-bg);color:var(--ga-text);margin:-24px;padding:28px 24px 38px;min-height:calc(100vh - 64px)}
+.website-view .wv-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:18px}
+.website-view .wv-eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:#9f91ff;font-weight:800;margin-bottom:7px}
+.website-view h1{font-size:28px;line-height:1.05;margin:0 0 6px;color:#fff}
+.website-view .wv-sub{font-size:14px;color:#d1d1d3;margin:0}
+.website-view .wv-open{color:#fff;background:#18181b;border:1px solid var(--ga-border);padding:10px 15px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:underline}
+.website-view .wv-toolbar{height:61px;border:1px solid var(--ga-border);background:var(--ga-panel);border-radius:12px;display:flex;align-items:center;justify-content:space-between;padding:0 13px 0 16px;margin:18px 0}
+.website-view .wv-month{display:flex;align-items:center;gap:10px;color:#c8c8ca;font-size:13px}
+.website-view .wv-month svg{stroke:#9f91ff}.website-view .wv-month strong{color:#fff}
+.website-view .wv-switch{display:flex;gap:8px}
+.website-view .wv-switch button{border:1px solid var(--ga-border);background:#19191b;color:#d6d6d8;padding:8px 13px;border-radius:8px;cursor:pointer}
+.website-view .wv-switch button.active{border-color:#9f91ff;color:#a99cff;background:#202025}
+.website-view .wv-note{background:#1b1b1a;border:1px solid #373734;border-radius:10px;padding:13px 16px;color:#d0d0d0;font-size:12px;margin-bottom:20px}
+.website-view .wv-note a{color:#c8baff}.website-view .wv-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+.website-view .wv-kpi{position:relative;background:var(--ga-panel);border:1px solid var(--ga-border);border-radius:13px;padding:21px 20px 17px;min-height:135px;box-shadow:0 9px 25px rgba(0,0,0,.22)}
+.website-view .wv-kpi-label{font-size:13px;color:#d0d0d2;margin-bottom:17px}.website-view .wv-kpi-value{font-size:30px;font-weight:800;line-height:1;color:#fff;margin-bottom:9px}.website-view .wv-kpi-note{font-size:12px;color:#929295}
+.website-view .wv-kpi-icon{position:absolute;right:18px;top:18px;width:31px;height:31px;border-radius:50%;background:#1c1c1a;display:grid;place-items:center}.website-view .wv-kpi-icon svg{stroke:#9f91ff}
+.website-view .wv-charts{display:grid;grid-template-columns:1.8fr 1fr;gap:18px}
+.website-view .wv-panel{background:var(--ga-panel);border:1px solid var(--ga-border);border-radius:13px;padding:20px 22px;min-height:430px;box-shadow:0 10px 28px rgba(0,0,0,.25)}
+.website-view .wv-panel h2{font-size:16px;margin:0 0 5px;color:#fff}.website-view .wv-panel-sub{font-size:12px;color:#9b9b9d;margin-bottom:15px}
+.website-view .wv-bars{height:315px;display:grid;grid-template-columns:52px 1fr;grid-template-rows:1fr 50px;margin-top:2px}
+.website-view .wv-yaxis{display:flex;flex-direction:column;justify-content:space-between;text-align:right;padding:2px 10px 0 0;color:#969699;font-size:11px}
+.website-view .wv-plot{position:relative;display:flex;align-items:flex-end;gap:18px;border-bottom:1px solid #414145;background:repeating-linear-gradient(to bottom,#303034 0,#303034 1px,transparent 1px,transparent 25%)}
+.website-view .wv-bar{flex:1;max-width:106px;background:#8b7de5;border-radius:6px 6px 0 0;min-width:16px}
+.website-view .wv-xlabels{grid-column:2;display:flex;gap:18px;padding-top:10px}.website-view .wv-xlabels span{flex:1;max-width:106px;color:#aaa9ad;font-size:10px;text-align:center;transform:rotate(-24deg);transform-origin:top center;white-space:nowrap}
+.website-view .wv-donut-wrap{height:280px;display:grid;place-items:center}.website-view .wv-donut{width:225px;height:225px;border-radius:50%;background:conic-gradient(#8b7de5 0 42.87%,#1ba37a 42.87% 63.48%,#388dde 63.48% 79.35%,#d98d00 79.35% 93.47%,#17a91e 93.47% 97.58%,#e86fae 97.58% 98.6%,#6aafff 98.6% 100%);position:relative;box-shadow:inset 0 0 0 1px #ddd;transform:rotate(-90deg)}
+.website-view .wv-donut:after{content:"";position:absolute;inset:40px;border-radius:50%;background:var(--ga-panel);box-shadow:0 0 0 1px #eee}
+.website-view .wv-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 9px;font-size:12px;line-height:1.25}.website-view .wv-legend span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;background:currentColor}
+.website-view .wv-table{display:none;background:var(--ga-panel);border:1px solid var(--ga-border);border-radius:13px;padding:20px;overflow:auto}.website-view .wv-table table{width:100%;border-collapse:collapse}.website-view .wv-table th,.website-view .wv-table td{padding:12px;border-bottom:1px solid #303034;text-align:left;font-size:12px}.website-view .wv-table th{color:#96969a;text-transform:uppercase;font-size:10px}.website-view .wv-table td{color:#e8e8ea}
+@media(max-width:1100px){.website-view .wv-kpis{grid-template-columns:repeat(2,1fr)}.website-view .wv-charts{grid-template-columns:1fr}}
+@media(max-width:650px){.website-view{margin:-16px;padding:20px 14px}.website-view .wv-kpis{grid-template-columns:1fr}.website-view .wv-toolbar{height:auto;padding:12px;gap:12px;align-items:flex-start;flex-direction:column}.website-view .wv-plot,.website-view .wv-xlabels{gap:7px}.website-view .wv-xlabels span{font-size:8px}}
 </style>
 </head>
 <body>
@@ -230,39 +242,40 @@
   </div>
 
   <div id="websiteView" class="website-view" style="display:none;">
-    <div class="website-head">
-      <div><span class="eyebrow">Google Analytics 4</span><h1>Website Visits</h1><p class="sub">Monthly traffic for the KARIKAALA website and acquisition-channel performance.</p></div>
-      <a class="open-site" href="https://karikaala-mailchimp-app.onrender.com/" target="_blank" rel="noreferrer">Open Website</a>
+    <div class="wv-head">
+      <div><div class="wv-eyebrow">Google Analytics 4</div><h1>Website Visits</h1><p class="wv-sub">Monthly traffic for the KARIKAALA website and acquisition-channel performance.</p></div>
+      <a class="wv-open" href="https://karikaala-mailchimp-app.onrender.com/" target="_blank" rel="noreferrer">Open Website</a>
     </div>
-    <p class="source-note"><strong>August 2026 month-to-date.</strong> Manual GA4 snapshot covering 1–24 August 2026.</p>
-    <div class="ga-grid">
-      <div class="ga-kpi"><div class="ga-label">Sessions</div><div class="ga-value">7,430</div><div class="ga-label">All acquisition channels</div></div>
-      <div class="ga-kpi"><div class="ga-label">Engaged sessions</div><div class="ga-value">7,320</div><div class="ga-label">98.5% engagement rate</div></div>
-      <div class="ga-kpi"><div class="ga-label">Average engagement</div><div class="ga-value">28 sec</div><div class="ga-label">Average per session</div></div>
-      <div class="ga-kpi"><div class="ga-label">Key events</div><div class="ga-value">17,019</div><div class="ga-label">38,026 total events</div></div>
+    <div class="wv-toolbar">
+      <div class="wv-month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/></svg><span>Reporting month</span><strong>August 2026</strong></div>
+      <div class="wv-switch"><button id="wvChartBtn" class="active" onclick="setWebsiteMode('chart')">Charts</button><button id="wvTableBtn" onclick="setWebsiteMode('table')">Channel table</button></div>
     </div>
-    <div class="ga-layout">
-      <section class="ga-card"><h2>Sessions by channel</h2>
-        <div class="ga-bar-row"><span>Email</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:100%"></div></div><strong>3,185</strong></div>
-        <div class="ga-bar-row"><span>Organic Search</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:48.1%"></div></div><strong>1,531</strong></div>
-        <div class="ga-bar-row"><span>Direct</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:37%"></div></div><strong>1,179</strong></div>
-        <div class="ga-bar-row"><span>Organic Social</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:32.9%"></div></div><strong>1,049</strong></div>
-        <div class="ga-bar-row"><span>Unassigned</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:9.6%"></div></div><strong>305</strong></div>
-        <div class="ga-bar-row"><span>Referral</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:2.4%"></div></div><strong>76</strong></div>
-        <div class="ga-bar-row"><span>AI Assistant</span><div class="ga-bar-track"><div class="ga-bar-fill" style="width:.5%"></div></div><strong>15</strong></div>
+    <div class="wv-note"><strong>August 2026 is month-to-date.</strong>&nbsp; Data covers 1–24 August 2026 for <a href="https://karikaala-mailchimp-app.onrender.com/" target="_blank">https://karikaala-mailchimp-app.onrender.com/</a> and was checked directly in KARIKAALA Google Analytics.</div>
+    <div class="wv-kpis">
+      <div class="wv-kpi"><div class="wv-kpi-label">Sessions</div><div class="wv-kpi-value">7,430</div><div class="wv-kpi-note">All acquisition channels</div><span class="wv-kpi-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M5 3l5 14 2-6 6-2L5 3z"/><path d="M15 15l4 4"/></svg></span></div>
+      <div class="wv-kpi"><div class="wv-kpi-label">Engaged Sessions</div><div class="wv-kpi-value">7,320</div><div class="wv-kpi-note">98.5% engagement rate</div><span class="wv-kpi-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></span></div>
+      <div class="wv-kpi"><div class="wv-kpi-label">Average Engagement</div><div class="wv-kpi-value">28 sec</div><div class="wv-kpi-note">Average per session</div><span class="wv-kpi-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="13" r="7"/><path d="M12 13l3-3M9 3h6"/></svg></span></div>
+      <div class="wv-kpi"><div class="wv-kpi-label">Key Events</div><div class="wv-kpi-value">17,019</div><div class="wv-kpi-note">38,026 total events</div><span class="wv-kpi-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M13 2L4 14h7l-1 8 10-13h-7V2z"/></svg></span></div>
+    </div>
+    <div id="wvCharts" class="wv-charts">
+      <section class="wv-panel"><h2>Sessions by Channel</h2><div class="wv-panel-sub">Monthly channel volume for August 2026</div>
+        <div class="wv-bars"><div class="wv-yaxis"><span>3200</span><span>2400</span><span>1600</span><span>800</span><span>0</span></div><div class="wv-plot">
+          <div class="wv-bar" style="height:99.5%"></div><div class="wv-bar" style="height:47.8%"></div><div class="wv-bar" style="height:36.8%"></div><div class="wv-bar" style="height:32.8%"></div><div class="wv-bar" style="height:9.5%"></div><div class="wv-bar" style="height:2.4%"></div><div class="wv-bar" style="height:.6%"></div>
+        </div><div></div><div class="wv-xlabels"><span>Email</span><span>Organic Search</span><span>Direct</span><span>Organic Social</span><span>Unassigned</span><span>Referral</span><span>AI Assistant</span></div></div>
       </section>
-      <section class="ga-card ga-table-wrap"><h2>Channel performance</h2>
-        <table><thead><tr><th>Channel</th><th>Share</th><th>Engagement</th><th>Avg.</th></tr></thead><tbody>
-          <tr><td>Email</td><td>42.9%</td><td>100.0%</td><td>2 sec</td></tr>
-          <tr><td>Organic Search</td><td>20.6%</td><td>96.7%</td><td>73 sec</td></tr>
-          <tr><td>Direct</td><td>15.9%</td><td>97.5%</td><td>43 sec</td></tr>
-          <tr><td>Organic Social</td><td>14.1%</td><td>99.5%</td><td>16 sec</td></tr>
-          <tr><td>Unassigned</td><td>4.1%</td><td>89.2%</td><td>48 sec</td></tr>
-          <tr><td>Referral</td><td>1.0%</td><td>96.1%</td><td>71 sec</td></tr>
-          <tr><td>AI Assistant</td><td>0.2%</td><td>86.7%</td><td>98 sec</td></tr>
-        </tbody></table>
-      </section>
+      <section class="wv-panel"><h2>Channel Share</h2><div class="wv-panel-sub">Percentage of total sessions</div><div class="wv-donut-wrap"><div class="wv-donut"></div></div><div class="wv-legend">
+        <span style="color:#6aafff">AI Assistant</span><span style="color:#388dde">Direct</span><span style="color:#8b7de5">Email</span><span style="color:#1ba37a">Organic Search</span><span style="color:#d98d00">Organic Social</span><span style="color:#e86fae">Referral</span><span style="color:#17a91e">Unassigned</span>
+      </div></section>
     </div>
+    <div id="wvTable" class="wv-table"><h2>Monthly Channel Report</h2><table><thead><tr><th>Channel</th><th>Sessions</th><th>Share</th><th>Engaged Sessions</th><th>Engagement Rate</th><th>Avg. Engagement</th><th>Events</th><th>Key Events</th></tr></thead><tbody>
+      <tr><td>Email</td><td>3,185</td><td>42.9%</td><td>3,184</td><td>100.0%</td><td>2 sec</td><td>15,422</td><td>7,720</td></tr>
+      <tr><td>Organic Search</td><td>1,531</td><td>20.6%</td><td>1,481</td><td>96.7%</td><td>73 sec</td><td>9,078</td><td>3,477</td></tr>
+      <tr><td>Direct</td><td>1,179</td><td>15.9%</td><td>1,149</td><td>97.5%</td><td>43 sec</td><td>5,736</td><td>2,145</td></tr>
+      <tr><td>Organic Social</td><td>1,049</td><td>14.1%</td><td>1,044</td><td>99.5%</td><td>16 sec</td><td>5,907</td><td>2,815</td></tr>
+      <tr><td>Unassigned</td><td>305</td><td>4.1%</td><td>272</td><td>89.2%</td><td>48 sec</td><td>1,407</td><td>671</td></tr>
+      <tr><td>Referral</td><td>76</td><td>1.0%</td><td>73</td><td>96.1%</td><td>71 sec</td><td>381</td><td>155</td></tr>
+      <tr><td>AI Assistant</td><td>15</td><td>0.2%</td><td>13</td><td>86.7%</td><td>98 sec</td><td>95</td><td>36</td></tr>
+    </tbody></table></div>
   </div>
 
   <footer>Source: Meta Ads Manager + Mailchimp campaign reports. Data is served live from this site's backend — use the <a href="/admin">Admin</a> page to add new months.</footer>
@@ -757,6 +770,13 @@ function setView(view) {
   document.getElementById("tableToggle").classList.toggle("active", view === "table");
   document.getElementById("itemChart").style.display = view === "chart" ? "" : "none";
   document.getElementById("itemTable").style.display = view === "table" ? "" : "none";
+}
+
+function setWebsiteMode(mode) {
+  document.getElementById("wvCharts").style.display = mode === "chart" ? "grid" : "none";
+  document.getElementById("wvTable").style.display = mode === "table" ? "block" : "none";
+  document.getElementById("wvChartBtn").classList.toggle("active", mode === "chart");
+  document.getElementById("wvTableBtn").classList.toggle("active", mode === "table");
 }
 
 function setChannel(ch) {
