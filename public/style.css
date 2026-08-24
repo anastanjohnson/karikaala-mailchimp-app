@@ -220,6 +220,8 @@ tr.compare-row.selected-row td:first-child { font-weight: 700; }
 .status-pill.sent, .status-pill.active { background: var(--status-good)22; color: var(--status-good); }
 .status-pill.scheduled, .status-pill.completed { background: var(--status-warning)22; color: var(--status-warning); }
 .status-pill.draft, .status-pill.paused { background: var(--text-muted)22; color: var(--text-secondary); }
+.status-pill.status-active { background: var(--status-good)22; color: var(--status-good); }
+.status-pill.status-complete { background: var(--text-muted)22; color: var(--text-secondary); }
 .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px; }
 .month-bars { display: flex; align-items: flex-end; gap: 10px; height: 160px; padding-top: 10px; }
 .month-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
