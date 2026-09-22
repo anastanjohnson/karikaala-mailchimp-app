@@ -3,6 +3,7 @@ const session = require("express-session");
 const rateLimit = require("express-rate-limit");
 const crypto = require("crypto");
 const path = require("path");
+const fs = require("fs");
 const db = require("./db");
 
 const app = express();
@@ -92,7 +93,12 @@ app.get("/style.css", (req, res) => res.sendFile(path.join(__dirname, "public", 
 
 // Everything else that serves a page requires a signed-in session first.
 app.get(["/", "/index.html"], requireSiteAuthPage, (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  const html = fs.readFileSync(path.join(__dirname, "public", "index.html"), "utf8");
+  res.type("html").send(html.replace("</body>", '<script src="/spending-charts.js"></script></body>'));
+});
+
+app.get("/spending-charts.js", requireSiteAuthPage, (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "spending-charts.js"));
 });
 
 // All other /api/* data routes require the site-wide session too.
