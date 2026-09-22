@@ -6,6 +6,13 @@
 <title>Marketing Dashboard — KARIKAALA</title>
 <link rel="stylesheet" href="/style.css">
 <style>
+.total-spend-scroll{overflow-x:auto;padding:4px}
+#monthlyTotalSpendBars{min-width:720px;height:190px}
+#monthlyTotalSpendBars .month-col{min-width:64px;border:0;background:transparent;color:inherit;padding:0;cursor:pointer;font:inherit}
+#monthlyTotalSpendBars .month-col:focus-visible{outline:2px solid var(--status-warning);outline-offset:3px}
+#monthlyTotalSpendBars .month-bar{background:#9183e6;cursor:pointer}
+#monthlyTotalSpendBars .month-bar.highest{background:#b3a5ff}
+#monthlyTotalSpendBars .month-val{white-space:nowrap}
 .website-view{--ga-bg:#0c0c0d;--ga-panel:#18181b;--ga-panel-2:#1b1b1d;--ga-border:#343438;--ga-text:#f7f7f8;--ga-muted:#9d9d9f;--ga-purple:#8b7de5;background:var(--ga-bg);color:var(--ga-text);margin:-24px;padding:28px 24px 38px;min-height:calc(100vh - 64px)}
 .website-view .wv-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:18px}
 .website-view .wv-eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:#9f91ff;font-weight:800;margin-bottom:7px}
@@ -140,6 +147,12 @@
       <span id="compareRangeLabel" style="font-size:12px; color:var(--text-muted); white-space:nowrap;"></span>
     </div>
     <div class="controls full-row" id="compareMonthButtons" style="margin-bottom:14px;"></div>
+    <section aria-labelledby="monthlyTotalSpendTitle">
+      <h2 id="monthlyTotalSpendTitle">Monthly total spending</h2>
+      <p class="desc">Recorded costs across Meta Ads, Mailchimp, Design, Collaboration / Triston and OpenTable. All recorded months stay visible for comparison. Click a bar to select a month. Missing invoices are not estimated.</p>
+      <p class="desc" id="monthlyTotalSpendSummary"></p>
+      <div class="total-spend-scroll"><div class="month-bars" id="monthlyTotalSpendBars"></div></div>
+    </section>
 
     <div class="kpi-group kpi-group-spend">
       <div class="kpi-group-heading"><span class="kpi-group-dot"></span>Spending</div>
@@ -1328,6 +1341,7 @@ function renderCompare() {
   if (!allMonths.length) return;
   populateCompareRangeSelects();
   renderCompareMonthButtons();
+  renderMonthlyTotalSpend();
   const months = monthsInRange();
 
   const isPredicted = months.length === 1 && !allMonths.includes(months[0]);
@@ -1493,11 +1507,42 @@ function renderCompare() {
   renderCompareDetail();
 }
 
-function spendPerGuestForMonth(m) {
+function totalSpendForMonth(m) {
   const mcSpend = invoiceFor(m);
   const metaSpend = computeKpisMeta(itemsFor("meta", m)).spend;
   const extraSpend = EXTRA_VENDORS.reduce((s,v) => s + extraVendorSpendForMonths(v, [m]), 0);
-  const spend = mcSpend + metaSpend + extraSpend;
+  return mcSpend + metaSpend + extraSpend;
+}
+
+function renderMonthlyTotalSpend() {
+  const months = allMonthsUnion();
+  const el = document.getElementById("monthlyTotalSpendBars");
+  const summary = document.getElementById("monthlyTotalSpendSummary");
+  if (!months.length) {
+    el.innerHTML = '<div class="empty-state">No monthly spending data recorded yet.</div>';
+    summary.textContent = '';
+    return;
+  }
+  const values = months.map(totalSpendForMonth);
+  const max = Math.max(...values, 0);
+  const highest = months.filter((m, i) => values[i] === max);
+  summary.textContent = max > 0
+    ? `Highest recorded spending: ${highest.map(m => MONTH_LABELS[m] || m).join(', ')} · ${eur(max)}`
+    : 'No spending recorded for the available months.';
+  el.innerHTML = months.map((m, i) => {
+    const selected = compareRange.from === m && compareRange.to === m;
+    const label = MONTH_LABELS[m] || m;
+    const height = max > 0 ? values[i] / max * 100 : 0;
+    return `<button type="button" class="month-col" aria-label="${label}: ${eur(values[i])}" aria-pressed="${selected}" onclick="selectCompareSingleMonth('${m}')">
+      <span class="month-val">${eur(values[i])}</span>
+      <span class="month-bar-wrap"><span class="month-bar ${selected ? 'selected' : ''} ${max > 0 && values[i] === max ? 'highest' : ''}" style="height:${height}%;width:100%"></span></span>
+      <span class="month-lbl">${label}</span>
+    </button>`;
+  }).join('');
+}
+
+function spendPerGuestForMonth(m) {
+  const spend = totalSpendForMonth(m);
   const guests = guestsFor(m);
   return guests > 0 ? spend / guests : null;
 }
