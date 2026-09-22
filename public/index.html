@@ -347,10 +347,10 @@ function extraVendorSpendForMonths(vendor, months) {
 }
 
 // ---- Opentable tab data (pulled manually from OpenTable Guest Center) ----
-// Real monthly invoice totals from Billing History (Aug 2026 not yet billed).
+// Real monthly invoice totals; August 2026 confirmed by management.
 const OPENTABLE_INVOICES = {
   "2026-01": 625.35, "2026-02": 291.55, "2026-03": 405.79, "2026-04": 587.67,
-  "2026-05": 252.88, "2026-06": 233.24, "2026-07": 242.17,
+  "2026-05": 252.88, "2026-06": 233.24, "2026-07": 242.17, "2026-08": 292.15,
 };
 // Feed the real invoice totals into the "Opentable" extra-vendor line for every billed month.
 Object.entries(OPENTABLE_INVOICES).forEach(([m, amt]) => {
